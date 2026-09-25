@@ -1,0 +1,122 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        // 1. Users Table
+       
+
+        // 2. Dosen Table
+        Schema::create('dosen', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('nip')->unique();
+            $table->string('nama_dosen');
+            $table->string('email')->nullable();
+            $table->timestamps();
+        });
+
+        // 3. Mahasiswa Table
+        Schema::create('mahasiswa', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('nim')->unique();
+            $table->string('nama_mahasiswa');
+            $table->string('prodi')->nullable();
+            $table->string('angkatan')->nullable();
+            $table->timestamps();
+        });
+
+        // 4. Guru Pamong Table
+        Schema::create('guru_pamong', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('nip_nik')->unique();
+            $table->string('nama_guru_pamong');
+            $table->string('no_hp')->nullable();
+            $table->timestamps();
+        });
+
+        // 5. Sekolah Mitra Table
+        Schema::create('sekolah_mitra', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama_sekolah');
+            $table->text('alamat')->nullable();
+            $table->timestamps();
+        });
+
+        // 6. Periode Akademik Table
+        Schema::create('periode_akademik', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama_periode');
+            $table->date('tanggal_mulai');
+            $table->date('tanggal_selesai');
+            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
+            $table->timestamps();
+        });
+
+        // 7. Plotting Bimbingan Table
+        Schema::create('plotting_bimbingan', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('periode_id')->constrained('periode_akademik')->onDelete('cascade');
+            $table->foreignId('dosen_id')->constrained('dosen')->onDelete('cascade');
+            $table->foreignId('mahasiswa_id')->unique()->constrained('mahasiswa')->onDelete('cascade');
+            $table->foreignId('gupam_id')->constrained('guru_pamong')->onDelete('cascade');
+            $table->foreignId('sekolah_id')->constrained('sekolah_mitra')->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        // 8. Modul Materi Table
+        Schema::create('modul_materi', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('dosen_id')->constrained('dosen')->onDelete('cascade');
+            $table->string('judul_materi');
+            $table->text('deskripsi')->nullable();
+            $table->string('file_path');
+            $table->dateTime('tgl_upload');
+            $table->timestamps();
+        });
+
+        // 9. Konsultasi Table
+        Schema::create('konsultasi', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('plotting_id')->constrained('plotting_bimbingan')->onDelete('cascade');
+            $table->date('tanggal_konsul');
+            $table->string('media_konsul');
+            $table->text('topik_dibahas');
+            $table->text('refleksi_mahasiswa')->nullable();
+            $table->text('saran_dosen')->nullable();
+            $table->string('paraf_dosen')->nullable();
+            $table->enum('status_validasi', ['pending', 'disetujui', 'ditolak'])->default('pending');
+            $table->timestamps();
+        });
+
+        // 10. Komentar Gupam Table
+        Schema::create('komentar_gupam', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('konsultasi_id')->constrained('konsultasi')->onDelete('cascade');
+            $table->foreignId('gupam_id')->constrained('guru_pamong')->onDelete('cascade');
+            $table->text('catatan_umpan_balik');
+            $table->dateTime('tgl_komentar');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('komentar_gupam');
+        Schema::dropIfExists('konsultasi');
+        Schema::dropIfExists('modul_materi');
+        Schema::dropIfExists('plotting_bimbingan');
+        Schema::dropIfExists('periode_akademik');
+        Schema::dropIfExists('sekolah_mitra');
+        Schema::dropIfExists('guru_pamong');
+        Schema::dropIfExists('mahasiswa');
+        Schema::dropIfExists('dosen');
+    }
+};
