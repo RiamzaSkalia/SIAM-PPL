@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('nim')->unique();
             $table->string('nama_mahasiswa');
             $table->string('prodi')->nullable();
+            $table->string('semester')->nullable();
             $table->string('angkatan')->nullable();
             $table->timestamps();
         });

@@ -75,7 +75,7 @@ class SiamDemoSeeder extends Seeder
             'nim'            => '2201001',
             'nama_mahasiswa' => $userMahasiswa->name,
             'prodi'          => 'Pendidikan Teknik Informatika dan Komputer',
-            'semester'       => '7',
+            'semester'       => '7', // CEK: pastikan kolom ini memang ada di migration mahasiswa kamu
         ]);
 
         // 3. Pasangkan mahasiswa dengan dosen, guru pamong, dan sekolah
@@ -87,20 +87,21 @@ class SiamDemoSeeder extends Seeder
             'sekolah_id'   => $sekolah->id,
         ]);
 
-        // 4. Riwayat konsultasi contoh: 3 disetujui, 1 pending, 1 ditolak
+        // 4. Riwayat konsultasi contoh: 4 disetujui, 1 pending
         $contohKonsultasi = [
-            [30, 'disetujui', 'Diskusi RPP pertemuan pertama'],
-            [24, 'disetujui', 'Evaluasi praktik mengajar minggu 1'],
-            [17, 'disetujui', 'Revisi media pembelajaran'],
-            [10, 'pending',   'Konsultasi kendala kelas'],
-            [3,  'ditolak',   'Draft laporan akhir (perlu revisi)'],
+            [30, '09:00', 'disetujui', 'Diskusi rencana kegiatan asistensi mengajar di sekolah mitra'],
+            [24, '13:00', 'disetujui', 'Pembahasan RPP dan perangkat pembelajaran'],
+            [17, '10:00', 'disetujui', 'Evaluasi minggu pertama pelaksanaan asistensi mengajar'],
+            [10, '14:00', 'disetujui', 'Pembahasan kendala dalam proses pembelajaran di kelas'],
+            [3,  '09:30', 'pending',   'Review laporan kemajuan dan persiapan ujian praktik mengajar'],
         ];
 
-        foreach ($contohKonsultasi as [$hariKe, $status, $topik]) {
+        foreach ($contohKonsultasi as [$hariKe, $jam, $status, $topik]) {
             Konsultasi::create([
                 'plotting_id'        => $plotting->id,
                 'tanggal_konsul'     => now()->subDays($hariKe),
-                'media_konsul'       => 'Tatap Muka',
+                'waktu_konsul'       => $jam,
+                'media_konsul'       => $hariKe % 2 === 0 ? 'Daring' : 'Tatap Muka',
                 'topik_dibahas'      => $topik,
                 'refleksi_mahasiswa' => 'Refleksi contoh untuk data dummy.',
                 'saran_dosen'        => $status === 'disetujui' ? 'Lanjutkan, sudah baik.' : null,

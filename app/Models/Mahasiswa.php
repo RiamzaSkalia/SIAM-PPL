@@ -21,7 +21,7 @@ class Mahasiswa extends Model
         'nim',
         'nama_mahasiswa',
         'prodi',
-        'angkatan',
+        'semester',
     ];
 
     public function user(): BelongsTo

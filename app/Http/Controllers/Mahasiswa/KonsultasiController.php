@@ -13,9 +13,9 @@ class KonsultasiController extends Controller
     public function index()
     {
         $mahasiswa = Auth::user()->mahasiswa()->with('plottingBimbingan.konsultasi')->firstOrFail();
-        
-        $riwayatKonsultasi = $mahasiswa->plottingBimbingan 
-            ? $mahasiswa->plottingBimbingan->konsultasi()->orderByDesc('tanggal_konsul')->get() 
+
+        $riwayatKonsultasi = $mahasiswa->plottingBimbingan
+            ? $mahasiswa->plottingBimbingan->konsultasi()->orderByDesc('tanggal_konsul')->orderByDesc('waktu_konsul')->get()
             : collect();
 
         return view('mahasiswa.konsultasi.index', compact('riwayatKonsultasi'));
@@ -45,15 +45,15 @@ class KonsultasiController extends Controller
             return back()->withErrors(['error' => 'Anda belum memiliki plotting bimbingan dari admin.']);
         }
 
-        // Simpan ke database dengan status default "menunggu" (Menunggu Verifikasi)
+        // Simpan ke database dengan status default "pending" (Menunggu Verifikasi)
         Konsultasi::create([
-            'plotting_bimbingan_id' => $mahasiswa->plottingBimbingan->id,
+            'plotting_id' => $mahasiswa->plottingBimbingan->id, // FIXED: sebelumnya 'plotting_bimbingan_id'
             'tanggal_konsul' => $request->tanggal_konsul,
             'waktu_konsul' => $request->waktu_konsul,
             'media_konsul' => $request->media_konsul,
             'topik_dibahas' => $request->topik_dibahas,
             'saran_dosen' => $request->saran_dosen,
-            'status_validasi' => 'menunggu', 
+            'status_validasi' => 'pending', // FIXED: sebelumnya 'menunggu' (bukan value enum yang valid)
         ]);
 
         return redirect()->route('mahasiswa.konsultasi.index')
