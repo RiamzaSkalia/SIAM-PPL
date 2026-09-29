@@ -16,18 +16,26 @@ Route::post('/logout', function () {
     return redirect('/'); 
 })->name('logout');
 
-// Route Admin
+// Route Admin (Diperbarui agar mendukung Halaman Tabel & Form Tambah)
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dosen', [AdminController::class, 'createDosen'])->name('dosen.index');
+    // Dosen Routes
+    Route::get('/dosen', [AdminController::class, 'indexDosen'])->name('dosen.index');
     Route::get('/dosen/create', [AdminController::class, 'createDosen'])->name('dosen.create');
     Route::post('/dosen/store', [AdminController::class, 'storeDosen'])->name('dosen.store');
+    Route::get('/dosen/{id}/edit', [AdminController::class, 'editDosen'])->name('dosen.edit');
+    Route::put('/dosen/{id}', [AdminController::class, 'updateDosen'])->name('dosen.update');
+    Route::delete('/dosen/{id}', [AdminController::class, 'destroyDosen'])->name('dosen.destroy');
 
-    Route::get('/mahasiswa', [AdminController::class, 'createMahasiswa'])->name('mahasiswa.index');
+    // Mahasiswa Routes
+    Route::get('/mahasiswa', [AdminController::class, 'indexMahasiswa'])->name('mahasiswa.index');
     Route::get('/mahasiswa/create', [AdminController::class, 'createMahasiswa'])->name('mahasiswa.create');
     Route::post('/mahasiswa/store', [AdminController::class, 'storeMahasiswa'])->name('mahasiswa.store');
+    Route::get('/mahasiswa/{id}/edit', [AdminController::class, 'editMahasiswa'])->name('mahasiswa.edit');
+    Route::put('/mahasiswa/{id}', [AdminController::class, 'updateMahasiswa'])->name('mahasiswa.update');
+    Route::delete('/mahasiswa/{id}', [AdminController::class, 'destroyMahasiswa'])->name('mahasiswa.destroy');
 });
 
-// Route Khusus Mahasiswa (Dilindungi Middleware Auth)
+// Route Khusus Mahasiswa (BAWAAN GIT - TIDAK DIUBAH)
 Route::middleware(['auth'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
@@ -37,8 +45,8 @@ Route::middleware(['auth'])->prefix('mahasiswa')->name('mahasiswa.')->group(func
     Route::get('/konsultasi', [KonsultasiController::class, 'index'])->name('konsultasi.index');
 });
 
-// Route Preview / Testing (Opsional untuk development)
+// Route Preview / Testing (BAWAAN GIT - TIDAK DIUBAH)
 Route::get('/preview-dashboard', function () {
-    Auth::loginUsingId(1); // Ganti angka 1 dengan ID user mahasiswa di database kamu
+    Auth::loginUsingId(1);
     return redirect()->route('mahasiswa.dashboard');
 });

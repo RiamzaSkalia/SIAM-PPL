@@ -17,13 +17,18 @@
         }
         .nav-btn.active { background-color: #ffffff; color: #3b31b2; }
         .nav-btn-logout { background-color: #f7bb53; color: #222; margin-top: 50px; }
-        .form-card { background-color: #b3bade; border-radius: 15px; padding: 25px; color: #111; }
-        .form-card-header { background-color: #5560c4; color: white; padding: 10px 15px; border-radius: 10px; font-weight: 600; margin-bottom: 20px; font-size: 14px; }
-        .form-control-custom { background-color: #fff9f0; border: none; border-radius: 12px; padding: 10px 15px; margin-bottom: 15px; }
-        .btn-simpan { background-color: #00c853; color: white; font-weight: bold; border-radius: 20px; padding: 8px 30px; border: none; }
-        .btn-batal { background-color: #888; color: white; font-weight: bold; border-radius: 20px; padding: 8px 30px; border: none; }
+        .table-custom { background-color: #aab2df; border-radius: 12px; overflow: hidden; }
+        .table-custom th { background-color: #5560c4; color: white; border: 1px solid #7a86e3; text-align: center; font-size: 14px; }
+        .table-custom td { border: 1px solid #9aa5e2; background-color: #cbcfef; font-size: 14px; text-align: center; vertical-align: middle; }
+        .btn-action-edit { background-color: #f0c352; color: #111; border-radius: 15px; font-size: 12px; font-weight: bold; padding: 3px 18px; border: none; text-decoration: none; }
+        .btn-action-hapus { background-color: #e52828; color: white; border-radius: 15px; font-size: 12px; font-weight: bold; padding: 3px 15px; border: none; }
+        .search-input { background-color: #cbcfef; border: none; border-radius: 20px; padding: 6px 20px; font-size: 14px; width: 300px; }
+        .btn-tambah { background-color: #00c853; color: white; font-weight: bold; border-radius: 20px; padding: 6px 20px; text-decoration: none; font-size: 14px; }
     </style>
 </head>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 <body>
 
 <div class="sidebar">
@@ -33,12 +38,12 @@
         <small style="font-size: 11px;">ADMIN</small>
     </div>
 
-    <a href="#" class="nav-btn">Dashboard</a>
-    <a href="{{ route('admin.dosen.create') }}" class="nav-btn {{ request()->routeIs('admin.dosen.*') ? 'active' : '' }}">Data Dosen</a>
-    <a href="{{ route('admin.mahasiswa.create') }}" class="nav-btn {{ request()->routeIs('admin.mahasiswa.*') ? 'active' : '' }}">Data Mahasiswa</a>
-    <a href="#" class="nav-btn">Data Sekolah</a>
-    <a href="#" class="nav-btn">Pemetaan Bimbingan</a>
-    <a href="#" class="nav-btn">Pengaturan Sistem</a>
+    <a href="#" class="nav-btn">DASHBOARD</a>
+    <a href="{{ route('admin.dosen.index') }}" class="nav-btn {{ request()->routeIs('admin.dosen.*') ? 'active' : '' }}">DATA DOSEN</a>
+    <a href="{{ route('admin.mahasiswa.index') }}" class="nav-btn {{ request()->routeIs('admin.mahasiswa.*') ? 'active' : '' }}">DATA MAHASISWA</a>
+    <a href="#" class="nav-btn">DATA SEKOLAH</a>
+    <a href="#" class="nav-btn">PEMETAAN BIMBINGAN</a>
+    <a href="#" class="nav-btn">PENGATURAN SISTEM</a>
 
     <form action="{{ route('logout') }}" method="POST">
         @csrf

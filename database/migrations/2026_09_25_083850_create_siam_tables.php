@@ -8,10 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // 1. Users Table
-       
-
-        // 2. Dosen Table
+        // 1. Dosen Table
         Schema::create('dosen', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
@@ -21,7 +18,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 3. Mahasiswa Table
+        // 2. Mahasiswa Table
         Schema::create('mahasiswa', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
@@ -33,7 +30,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 4. Guru Pamong Table
+        // 3. Guru Pamong Table
         Schema::create('guru_pamong', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
@@ -43,7 +40,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 5. Sekolah Mitra Table
+        // 4. Sekolah Mitra Table
         Schema::create('sekolah_mitra', function (Blueprint $table) {
             $table->id();
             $table->string('nama_sekolah');
@@ -51,7 +48,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 6. Periode Akademik Table
+        // 5. Periode Akademik Table
         Schema::create('periode_akademik', function (Blueprint $table) {
             $table->id();
             $table->string('nama_periode');
@@ -61,7 +58,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 7. Plotting Bimbingan Table
+        // 6. Plotting Bimbingan Table
         Schema::create('plotting_bimbingan', function (Blueprint $table) {
             $table->id();
             $table->foreignId('periode_id')->constrained('periode_akademik')->onDelete('cascade');
@@ -72,7 +69,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 8. Modul Materi Table
+        // 7. Modul Materi Table
         Schema::create('modul_materi', function (Blueprint $table) {
             $table->id();
             $table->foreignId('dosen_id')->constrained('dosen')->onDelete('cascade');
@@ -83,7 +80,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 9. Konsultasi Table
+        // 8. Konsultasi Table
         Schema::create('konsultasi', function (Blueprint $table) {
             $table->id();
             $table->foreignId('plotting_id')->constrained('plotting_bimbingan')->onDelete('cascade');
@@ -97,7 +94,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 10. Komentar Gupam Table
+        // 9. Komentar Gupam Table
         Schema::create('komentar_gupam', function (Blueprint $table) {
             $table->id();
             $table->foreignId('konsultasi_id')->constrained('konsultasi')->onDelete('cascade');
