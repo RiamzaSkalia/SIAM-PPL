@@ -33,6 +33,22 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/mahasiswa/{id}/edit', [AdminController::class, 'editMahasiswa'])->name('mahasiswa.edit');
     Route::put('/mahasiswa/{id}', [AdminController::class, 'updateMahasiswa'])->name('mahasiswa.update');
     Route::delete('/mahasiswa/{id}', [AdminController::class, 'destroyMahasiswa'])->name('mahasiswa.destroy');
+
+    // Sekolah & Guru Pamong Routes
+    Route::get('/sekolah', [AdminController::class, 'indexSekolah'])->name('sekolah.index');
+    Route::get('/sekolah/create', [AdminController::class, 'createSekolah'])->name('sekolah.create');
+    Route::post('/sekolah/store', [AdminController::class, 'storeSekolah'])->name('sekolah.store');
+    Route::get('/sekolah/{id}/edit', [AdminController::class, 'editSekolah'])->name('sekolah.edit');
+    Route::put('/sekolah/{id}', [AdminController::class, 'updateSekolah'])->name('sekolah.update');
+    Route::delete('/sekolah/{id}', [AdminController::class, 'destroySekolah'])->name('sekolah.destroy');
+
+    // Pemetaan Bimbingan Routes
+    Route::get('/pemetaan', [AdminController::class, 'indexPemetaan'])->name('pemetaan.index');
+    Route::get('/pemetaan/create', [AdminController::class, 'createPemetaan'])->name('pemetaan.create');
+    Route::post('/pemetaan/store', [AdminController::class, 'storePemetaan'])->name('pemetaan.store');
+    Route::get('/pemetaan/{id}/edit', [AdminController::class, 'editPemetaan'])->name('pemetaan.edit');
+    Route::put('/pemetaan/{id}', [AdminController::class, 'updatePemetaan'])->name('pemetaan.update');
+    Route::delete('/pemetaan/{id}', [AdminController::class, 'destroyPemetaan'])->name('pemetaan.destroy');
 });
 
 // Route Khusus Mahasiswa (BAWAAN GIT - TIDAK DIUBAH)

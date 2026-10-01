@@ -27,6 +27,7 @@
     </style>
 </head>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
 <body>
@@ -41,8 +42,8 @@
     <a href="#" class="nav-btn">DASHBOARD</a>
     <a href="{{ route('admin.dosen.index') }}" class="nav-btn {{ request()->routeIs('admin.dosen.*') ? 'active' : '' }}">DATA DOSEN</a>
     <a href="{{ route('admin.mahasiswa.index') }}" class="nav-btn {{ request()->routeIs('admin.mahasiswa.*') ? 'active' : '' }}">DATA MAHASISWA</a>
-    <a href="#" class="nav-btn">DATA SEKOLAH</a>
-    <a href="#" class="nav-btn">PEMETAAN BIMBINGAN</a>
+    <a href="{{ route('admin.sekolah.index') }}" class="nav-btn {{ request()->routeIs('admin.sekolah.*') ? 'active' : '' }}">DATA SEKOLAH</a>
+    <a href="{{ route('admin.pemetaan.index') }}" class="nav-btn {{ request()->routeIs('admin.pemetaan.*') ? 'active' : '' }}">PEMETAAN BIMBINGAN</a>
     <a href="#" class="nav-btn">PENGATURAN SISTEM</a>
 
     <form action="{{ route('logout') }}" method="POST">

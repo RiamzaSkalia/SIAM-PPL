@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SekolahMitra extends Model
 {
@@ -14,11 +13,13 @@ class SekolahMitra extends Model
 
     protected $fillable = [
         'nama_sekolah',
+        'jenjang',
+        'kuota',
         'alamat',
     ];
 
-    public function plottingBimbingan(): HasMany
+    public function guruPamong()
     {
-        return $this->hasMany(PlottingBimbingan::class, 'sekolah_id');
+        return $this->hasOne(GuruPamong::class, 'sekolah_id');
     }
 }
