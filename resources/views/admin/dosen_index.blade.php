@@ -40,12 +40,28 @@
             </thead>
             <tbody>
                 @forelse($dosen as $index => $item)
+                @php
+                    // Mengambil semua mahasiswa dari seluruh plotting dosen ini
+                    $mhsBimbingan = $item->plotting->pluck('mahasiswa')->flatten();
+                @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td class="text-start ps-3">{{ $item->nama_dosen }}</td>
+                    <td class="text-start ps-3 fw-semibold">{{ $item->nama_dosen }}</td>
                     <td>{{ $item->nip }}</td>
-                    <td>-</td>
-                    <td>-</td>
+                    <td class="text-start ps-3">
+                        @if($mhsBimbingan->count() > 0)
+                            <ol class="m-0 ps-3" style="font-size: 13px;">
+                                @foreach($mhsBimbingan as $mhs)
+                                    <li>{{ $mhs->nama_mahasiswa }}</li>
+                                @endforeach
+                            </ol>
+                        @else
+                            <span class="text-muted">-</span>
+                        @endif
+                    </td>
+                    <td>
+                        <span class="badge bg-primary rounded-pill px-3 py-2">{{ $mhsBimbingan->count() }} Mhs</span>
+                    </td>
                     <td>
                         <a href="{{ route('admin.dosen.edit', $item->id) }}" class="btn-action-edit me-1">Edit</a>
                         <button type="button" class="btn-action-hapus" onclick="openDeleteModal('{{ $item->id }}')">Hapus</button>
@@ -53,9 +69,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="py-4 text-center text-muted">
-                        Belum ada data dosen. Klik tombol <b>+ Tambah Dosen</b> di atas.
-                    </td>
+                    <td colspan="6" class="py-4 text-center text-muted">Belum ada data dosen.</td>
                 </tr>
                 @endforelse
             </tbody>

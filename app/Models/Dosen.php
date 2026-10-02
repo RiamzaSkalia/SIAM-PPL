@@ -10,4 +10,8 @@ class Dosen extends Model
     protected $fillable = ['user_id', 'nip', 'nama_dosen', 'email'];
 
     public function user() { return $this->belongsTo(User::class); }
+    public function plotting()
+    {
+        return $this->hasMany(PlottingBimbingan::class, 'dosen_id');
+    }
 }

@@ -32,22 +32,45 @@
                 <tr>
                     <th width="5%">No</th>
                     <th width="15%">NIM</th>
-                    <th width="25%">Nama Mahasiswa</th>
+                    <th width="20%">Nama Mahasiswa</th>
                     <th width="20%">Sekolah Mitra</th>
-                    <th width="15%">Dospem</th>
+                    <th width="15%">Dosen Pembimbing</th>
                     <th width="10%">Progres</th>
-                    <th width="15%">Aksi</th>
+                    <th width="20%">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($mahasiswa as $index => $item)
+                @php
+                    // Ambil data plotting pertama mahasiswa (jika ada)
+                    $plot = $item->plotting->first();
+                @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $item->nim }}</td>
-                    <td class="text-start ps-3">{{ $item->nama_mahasiswa }}</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
+                    <td class="text-start ps-3 fw-semibold">{{ $item->nama_mahasiswa }}</td>
+                    <td>
+                        @if($plot && $plot->sekolah)
+                            <span class="fw-semibold text-primary">{{ $plot->sekolah->nama_sekolah }}</span>
+                            <br><small class="text-muted">({{ $plot->sekolah->jenjang }})</small>
+                        @else
+                            <span class="badge bg-secondary">Belum Diplot</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($plot && $plot->dosen)
+                            <span class="fw-semibold">{{ $plot->dosen->nama_dosen }}</span>
+                        @else
+                            <span class="badge bg-secondary">Belum Ada DPL</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($plot)
+                            <span class="badge bg-success rounded-pill px-3 py-2">Aktif AM</span>
+                        @else
+                            <span class="badge bg-warning text-dark rounded-pill px-3 py-2">Belum Terdaftar</span>
+                        @endif
+                    </td>
                     <td>
                         <a href="{{ route('admin.mahasiswa.edit', $item->id) }}" class="btn-action-edit me-1">Edit</a>
                         <button type="button" class="btn-action-hapus" onclick="openDeleteModal('{{ $item->id }}')">Hapus</button>
@@ -55,9 +78,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="py-4 text-center text-muted">
-                        Belum ada data mahasiswa. Klik tombol <b>+ Tambah Mahasiswa</b> di atas.
-                    </td>
+                    <td colspan="7" class="py-4 text-center text-muted">Belum ada data mahasiswa.</td>
                 </tr>
                 @endforelse
             </tbody>

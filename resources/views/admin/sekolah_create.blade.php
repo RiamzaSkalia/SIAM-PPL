@@ -21,12 +21,12 @@
 
         {{-- SECTION 1: INFORMASI SEKOLAH MITRA --}}
         <div class="mb-4">
-            <h6 class="fw-bold text-uppercase mb-3" style="color: #3b31b2;">🏫 INFORMASI SEKOLAH MITRA</h6>
+            <h6 class="fw-bold text-uppercase mb-3" style="color: #3b31b2;">INFORMASI SEKOLAH MITRA</h6>
             <hr class="mt-0 mb-3">
 
             <div class="mb-3">
                 <label class="fw-bold mb-1 fs-6">Nama Sekolah Mitra <span class="text-danger">*</span></label>
-                <input type="text" name="nama_sekolah" class="form-control rounded-3 p-2" placeholder="SMPN 21 Banjarmasin" value="{{ old('nama_sekolah', $sekolah->nama_sekolah ?? '') }}" required>
+                <input type="text" name="nama_sekolah" class="form-control rounded-3 p-2" placeholder="Contoh: SMPN 21 Banjarmasin" value="{{ old('nama_sekolah', $sekolah->nama_sekolah ?? '') }}" required>
             </div>
 
             <div class="row mb-3">
@@ -34,10 +34,8 @@
                     <label class="fw-bold mb-1 fs-6">Jenjang Pendidikan <span class="text-danger">*</span></label>
                     <select name="jenjang" class="form-select rounded-3 p-2" required>
                         <option value="">-- Pilih Jenjang --</option>
-                        <option value="SD/MI" {{ (old('jenjang', $sekolah->jenjang ?? '') == 'SD/MI') ? 'selected' : '' }}>SD / MI</option>
                         <option value="SMP/MTS" {{ (old('jenjang', $sekolah->jenjang ?? '') == 'SMP/MTS') ? 'selected' : '' }}>SMP / MTS</option>
-                        <option value="SMA/MA" {{ (old('jenjang', $sekolah->jenjang ?? '') == 'SMA/MA') ? 'selected' : '' }}>SMA / MA</option>
-                        <option value="SMK" {{ (old('jenjang', $sekolah->jenjang ?? '') == 'SMK') ? 'selected' : '' }}>SMK</option>
+                        <option value="SMA/MA/SMK" {{ (old('jenjang', $sekolah->jenjang ?? '') == 'SMA/MA/SMK') ? 'selected' : '' }}>SMA / MA / SMK</option>
                     </select>
                 </div>
                 <div class="col-md-6">
@@ -48,28 +46,28 @@
 
             <div class="mb-3">
                 <label class="fw-bold mb-1 fs-6">Alamat Sekolah</label>
-                <input type="text" name="alamat" class="form-control rounded-3 p-2" placeholder="Jl. Raden Cakra, Banjarmasin" value="{{ old('alamat', $sekolah->alamat ?? '') }}">
+                <input type="text" name="alamat" class="form-control rounded-3 p-2" placeholder="Contoh: Jl. Raden Cakra, Banjarmasin" value="{{ old('alamat', $sekolah->alamat ?? '') }}">
             </div>
         </div>
 
         {{-- SECTION 2: AKUN & DATA GURU PAMONG --}}
         <div class="mb-4">
-            <h6 class="fw-bold text-uppercase mb-3" style="color: #3b31b2;">👩‍🏫 AKUN & DATA GURU PAMONG (UNTUK LOGIN PAMONG)</h6>
+            <h6 class="fw-bold text-uppercase mb-3" style="color: #3b31b2;">AKUN & DATA GURU PAMONG (UNTUK LOGIN PAMONG)</h6>
             <hr class="mt-0 mb-3">
 
             <div class="mb-3">
                 <label class="fw-bold mb-1 fs-6">NIP / NIK Guru Pamong <span class="text-danger">*</span></label>
-                <input type="text" name="nip_nik" class="form-control rounded-3 p-2" placeholder="198805122015032001" value="{{ old('nip_nik', $sekolah->guruPamong->nip_nik ?? '') }}" required>
+                <input type="text" name="nip_nik" class="form-control rounded-3 p-2" placeholder="Contoh: 198805122015032001" value="{{ old('nip_nik', $sekolah->guruPamong->nip_nik ?? '') }}" required>
             </div>
 
             <div class="mb-3">
                 <label class="fw-bold mb-1 fs-6">Nama Lengkap Guru Pamong <span class="text-danger">*</span></label>
-                <input type="text" name="nama_guru_pamong" class="form-control rounded-3 p-2" placeholder="Putri Ayu S.B., S.Pd" value="{{ old('nama_guru_pamong', $sekolah->guruPamong->nama_guru_pamong ?? '') }}" required>
+                <input type="text" name="nama_guru_pamong" class="form-control rounded-3 p-2" placeholder="Contoh: Putri Ayu S.B., S.Pd" value="{{ old('nama_guru_pamong', $sekolah->guruPamong->nama_guru_pamong ?? '') }}" required>
             </div>
 
             <div class="mb-3">
                 <label class="fw-bold mb-1 fs-6">Nomor Telepon / WhatsApp Guru Pamong</label>
-                <input type="text" name="no_hp" class="form-control rounded-3 p-2" placeholder="085389588049" value="{{ old('no_hp', $sekolah->guruPamong->no_hp ?? '') }}">
+                <input type="text" name="no_hp" class="form-control rounded-3 p-2" placeholder="Contoh: 085389588049" value="{{ old('no_hp', $sekolah->guruPamong->no_hp ?? '') }}">
             </div>
 
             <div class="mb-3">

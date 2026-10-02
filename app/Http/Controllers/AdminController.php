@@ -277,12 +277,13 @@ class AdminController extends Controller
     public function indexDosen(Request $request)
     {
         $search = $request->query('search');
-        $dosen = Dosen::when($search, function ($query, $search) {
-            return $query->where('nama_dosen', 'like', "%{$search}%")
-                ->orWhere('nip', 'like', "%{$search}%");
-        })
-        ->latest()
-        ->get();
+        
+        // Memuat relasi plotting & mahasiswa yang dibimbing
+        $dosen = Dosen::with(['plotting.mahasiswa'])
+            ->when($search, function ($query, $search) {
+                return $query->where('nama_dosen', 'like', "%{$search}%")
+                             ->orWhere('nip', 'like', "%{$search}%");
+            })->latest()->get();
 
         return view('admin.dosen_index', compact('dosen'));
     }
@@ -387,12 +388,13 @@ class AdminController extends Controller
     public function indexMahasiswa(Request $request)
     {
         $search = $request->query('search');
-        $mahasiswa = Mahasiswa::when($search, function ($query, $search) {
-            return $query->where('nama_mahasiswa', 'like', "%{$search}%")
-                ->orWhere('nim', 'like', "%{$search}%");
-        })
-        ->latest()
-        ->get();
+        
+        // Memuat relasi plotting ke sekolah & dosen pembimbing
+        $mahasiswa = Mahasiswa::with(['plotting.sekolah', 'plotting.dosen'])
+            ->when($search, function ($query, $search) {
+                return $query->where('nama_mahasiswa', 'like', "%{$search}%")
+                             ->orWhere('nim', 'like', "%{$search}%");
+            })->latest()->get();
 
         return view('admin.mahasiswa_index', compact('mahasiswa'));
     }

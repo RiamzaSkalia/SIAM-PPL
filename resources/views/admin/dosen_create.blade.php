@@ -21,7 +21,7 @@
 
         {{-- SECTION 1: INFORMASI DATA DOSEN --}}
         <div class="mb-4">
-            <h6 class="fw-bold text-uppercase mb-3" style="color: #3b31b2;">👨‍🏫 INFORMASI DOSEN PEMBIMBING</h6>
+            <h6 class="fw-bold text-uppercase mb-3" style="color: #3b31b2;">INFORMASI DOSEN PEMBIMBING</h6>
             <hr class="mt-0 mb-3">
 
             <div class="mb-3">
@@ -42,7 +42,7 @@
 
         {{-- SECTION 2: AKUN LOGIN DOSEN --}}
         <div class="mb-4">
-            <h6 class="fw-bold text-uppercase mb-3" style="color: #3b31b2;">🔑 AKUN LOGIN DOSEN</h6>
+            <h6 class="fw-bold text-uppercase mb-3" style="color: #3b31b2;">AKUN LOGIN DOSEN</h6>
             <hr class="mt-0 mb-3">
 
             <div class="mb-3">

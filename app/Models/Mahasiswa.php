@@ -25,4 +25,8 @@ class Mahasiswa extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function plotting()
+    {
+        return $this->belongsToMany(PlottingBimbingan::class, 'plotting_mahasiswa', 'mahasiswa_id', 'plotting_id');
+    }
 }

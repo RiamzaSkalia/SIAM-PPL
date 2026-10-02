@@ -21,7 +21,7 @@
 
         {{-- SECTION 1: INFORMASI MAHASISWA --}}
         <div class="mb-4">
-            <h6 class="fw-bold text-uppercase mb-3" style="color: #3b31b2;">🎓 INFORMASI MAHASISWA</h6>
+            <h6 class="fw-bold text-uppercase mb-3" style="color: #3b31b2;">INFORMASI MAHASISWA</h6>
             <hr class="mt-0 mb-3">
 
             <div class="mb-3">
@@ -55,7 +55,7 @@
 
         {{-- SECTION 2: AKUN LOGIN MAHASISWA --}}
         <div class="mb-4">
-            <h6 class="fw-bold text-uppercase mb-3" style="color: #3b31b2;">🔑 AKUN LOGIN MAHASISWA</h6>
+            <h6 class="fw-bold text-uppercase mb-3" style="color: #3b31b2;">AKUN LOGIN MAHASISWA</h6>
             <hr class="mt-0 mb-3">
 
             <div class="mb-3">
