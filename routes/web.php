@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Mahasiswa\DashboardController;
 use App\Http\Controllers\Mahasiswa\KonsultasiController;
+use App\Http\Controllers\Dosen\DashboardController as DosenDashboardController;
+use App\Http\Controllers\Dosen\VerifikasiController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -65,4 +67,17 @@ Route::middleware(['auth'])->prefix('mahasiswa')->name('mahasiswa.')->group(func
 Route::get('/preview-dashboard', function () {
     Auth::loginUsingId(1);
     return redirect()->route('mahasiswa.dashboard');
+});
+
+Route::middleware(['auth'])->prefix('dosen')->name('dosen.')->group(function () {
+    Route::get('/dashboard', [DosenDashboardController::class, 'index'])->name('dashboard');
+ 
+    Route::post('/konsultasi/{konsultasi}/setujui', [VerifikasiController::class, 'setujui'])->name('konsultasi.setujui');
+    Route::post('/konsultasi/{konsultasi}/tolak', [VerifikasiController::class, 'tolak'])->name('konsultasi.tolak');
+});
+
+Route::get('/preview-dashboard-dosen', function () {
+    $dosen = \App\Models\Dosen::first();
+    Auth::loginUsingId($dosen->user_id);
+    return redirect()->route('dosen.dashboard');
 });
