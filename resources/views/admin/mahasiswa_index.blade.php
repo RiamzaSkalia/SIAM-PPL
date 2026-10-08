@@ -72,8 +72,8 @@
                         @endif
                     </td>
                     <td>
-                        <a href="{{ route('admin.mahasiswa.edit', $item->id) }}" class="btn-action-edit me-1">Edit</a>
-                        <button type="button" class="btn-action-hapus" onclick="openDeleteModal('{{ $item->id }}')">Hapus</button>
+                        <a href="{{ route('admin.mahasiswa.edit', $item->id) }}" class="btn-action-edit me-1">✏️ Edit</a>
+                        <button type="button" class="btn-action-hapus" onclick="openDeleteModal('{{ $item->id }}')">🗑️ Hapus</button>
                     </td>
                 </tr>
                 @empty

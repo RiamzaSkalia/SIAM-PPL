@@ -18,9 +18,10 @@
 
 <div class="p-3" style="background-color: #f7ede2; border-radius: 12px;">
     <h6 class="fw-bold mb-3"><i class="bi bi-people-fill"></i> Alokasi Mahasiswa ke Sekolah Mitra, Guru Pamong, dan Dosen Pembimbing (PILKOM ULM)</h6>
+    
     {{-- Filter & Action Bar --}}
     <form action="{{ route('admin.pemetaan.index') }}" method="GET" class="row g-2 align-items-center mb-3">
-        <div class="col-md-5">
+        <div class="col-md-4">
             <input type="text" name="search" class="search-input w-100" placeholder="🔍 Cari Sekolah / Dosen / Mahasiswa..." value="{{ request('search') }}">
         </div>
         <div class="col-md-3">
@@ -38,7 +39,10 @@
                 <option value="SMA/MA/SMK" {{ request('jenjang') == 'SMA/MA/SMK' ? 'selected' : '' }}>SMA/MA/SMK</option>
             </select>
         </div>
-        <div class="col-md-2 text-end d-flex gap-1 justify-content-end">
+        <div class="col-md-3 d-flex gap-2 justify-content-end align-items-center">
+            <a href="{{ route('admin.pemetaan.pdf') }}" class="btn btn-danger rounded-pill px-3 fw-bold text-nowrap">
+                📄 Export PDF
+            </a>
             <a href="{{ route('admin.pemetaan.create') }}" class="btn-tambah text-nowrap">+ Plotting Baru</a>
         </div>
     </form>

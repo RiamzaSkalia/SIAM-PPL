@@ -12,6 +12,7 @@ class SekolahMitra extends Model
     protected $table = 'sekolah_mitra';
 
     protected $fillable = [
+        'npsn',
         'nama_sekolah',
         'jenjang',
         'kuota',

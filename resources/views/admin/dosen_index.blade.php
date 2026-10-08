@@ -63,8 +63,8 @@
                         <span class="badge bg-primary rounded-pill px-3 py-2">{{ $mhsBimbingan->count() }} Mhs</span>
                     </td>
                     <td>
-                        <a href="{{ route('admin.dosen.edit', $item->id) }}" class="btn-action-edit me-1">Edit</a>
-                        <button type="button" class="btn-action-hapus" onclick="openDeleteModal('{{ $item->id }}')">Hapus</button>
+                        <a href="{{ route('admin.dosen.edit', $item->id) }}" class="btn-action-edit me-1">✏️ Edit</a>
+                        <button type="button" class="btn-action-hapus" onclick="openDeleteModal('{{ $item->id }}')">🗑️ Hapus</button>
                     </td>
                 </tr>
                 @empty

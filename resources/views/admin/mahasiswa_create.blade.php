@@ -36,8 +36,8 @@
 
             <div class="row mb-3">
                 <div class="col-md-6 mb-3 mb-md-0">
-                    <label class="fw-bold mb-1 fs-6">Nomor HP / WhatsApp <span class="text-danger">*</span></label>
-                    <input type="text" name="no_hp" class="form-control rounded-3 p-2" placeholder="Contoh: 081234567890" value="{{ old('no_hp', $mahasiswa->no_hp ?? '') }}" required>
+                    <label class="fw-bold mb-1 fs-6">Nomor HP / WhatsApp</label>
+                    <input type="text" name="no_hp" class="form-control form-control-custom mb-3" placeholder="Contoh: 081234567890" value="{{ old('no_hp', $mahasiswa->no_hp ?? '') }}">
                 </div>
                 <div class="col-md-6">
                     <label class="fw-bold mb-1 fs-6">Periode Akademik Aktif <span class="text-danger">*</span></label>

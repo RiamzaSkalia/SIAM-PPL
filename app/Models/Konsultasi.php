@@ -37,6 +37,12 @@ class Konsultasi extends Model
         return $this->belongsTo(PlottingBimbingan::class, 'plotting_id');
     }
 
+    // TAMBAHKAN INI (Sebagai alias agar AdminController tidak error)
+    public function plotting(): BelongsTo
+    {
+        return $this->plottingBimbingan();
+    }
+
     public function komentarGupam(): HasMany
     {
         return $this->hasMany(KomentarGupam::class, 'konsultasi_id');

@@ -47,8 +47,8 @@
                     <td>{{ $item->jenjang ?? '-' }}</td>
                     <td><span class="badge bg-primary rounded-pill px-3 py-2">{{ $item->kuota }}</span></td>
                     <td>
-                        <a href="{{ route('admin.sekolah.edit', $item->id) }}" class="btn-action-edit me-1">Edit</a>
-                        <button type="button" class="btn-action-hapus" onclick="openDeleteModal('{{ $item->id }}')">Hapus</button>
+                        <a href="{{ route('admin.sekolah.edit', $item->id) }}" class="btn-action-edit me-1">✏️ Edit</a>
+                        <button type="button" class="btn-action-hapus" onclick="openDeleteModal('{{ $item->id }}')">🗑️ Hapus</button>
                     </td>
                 </tr>
                 @empty

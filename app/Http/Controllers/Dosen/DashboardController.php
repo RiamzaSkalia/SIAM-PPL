@@ -1,5 +1,6 @@
 <?php
 
+<<<<<<< Updated upstream
 namespace App\Http\Controllers\Dosen;
 
 use App\Http\Controllers\Controller;
@@ -17,4 +18,14 @@ class DashboardController extends Controller
         // Mengarahkan ke file view dashboard dosen yang asli
         return view('dosen.dashboard');
     }
+=======
+namespace App\Http\Controllers\Dosen; // Musti pakai \Dosen
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class DashboardController extends Controller
+{
+    // ...
+>>>>>>> Stashed changes
 }
