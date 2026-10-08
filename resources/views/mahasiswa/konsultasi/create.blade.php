@@ -4,26 +4,10 @@
 @section('page-title', 'Tambah Log Bimbingan')
 
 @section('content')
-<div class="mb-6">
-    <p class="text-sm text-gray-500 mt-1">Catat kegiatan bimbingan terbaru Anda</p>
-</div>
-<div class="max-w-4xl mx-auto space-y-6">
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 max-w-3xl">
 
-    {{-- Kotak Informasi --}}
-    <div class="bg-blue-50 border border-blue-200 rounded-2xl p-5 text-blue-900 shadow-sm flex items-start gap-3">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <div class="text-sm">
-            <p class="font-bold mb-1">Informasi Pengisian Log</p>
-            Data yang Anda simpan akan otomatis masuk ke riwayat konsultasi dan menambah jumlah bimbingan Anda. Status awal adalah <span class="font-semibold text-blue-700">Menunggu Verifikasi</span> hingga dosen pembimbing melakukan verifikasi.
-        </div>
-    </div>
-
-    {{-- Notifikasi Error Validasi --}}
     @if ($errors->any())
-        <div class="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-sm">
-            <p class="font-bold mb-1">Mohon periksa kembali formulir Anda:</p>
+        <div class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
             <ul class="list-disc list-inside space-y-1">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -32,70 +16,83 @@
         </div>
     @endif
 
-    {{-- Form Tambah Log Bimbingan --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-        <div class="mb-6">
-            <h2 class="text-xl font-extrabold text-gray-800">Tambah Log Bimbingan</h2>
-            <p class="text-sm text-gray-500 mt-1">Catat kegiatan bimbingan terbaru Anda</p>
+    <form method="POST" action="{{ route('mahasiswa.konsultasi.store') }}" class="space-y-5">
+        @csrf
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+                <label class="block font-bold text-gray-800 mb-2">Tanggal Konsultasi <span class="text-red-500">*</span></label>
+                <input type="date" name="tanggal_konsul" value="{{ old('tanggal_konsul', date('Y-m-d')) }}" required
+                       class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div>
+                <label class="block font-bold text-gray-800 mb-2">Waktu <span class="text-red-500">*</span></label>
+                <input type="time" name="waktu_konsul" value="{{ old('waktu_konsul', date('H:i')) }}" required
+                       class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
         </div>
 
-        <form action="{{ route('mahasiswa.konsultasi.store') }}" method="POST" class="space-y-6">
-            @csrf
+        <div>
+            <label class="block font-bold text-gray-800 mb-2">Media / Metode Konsultasi <span class="text-red-500">*</span></label>
+            <select name="media_konsul" required
+                    class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                <option value="">-- Pilih media --</option>
+                <option value="Tatap Muka" {{ old('media_konsul') === 'Tatap Muka' ? 'selected' : '' }}>Tatap Muka</option>
+                <option value="WhatsApp" {{ old('media_konsul') === 'WhatsApp' ? 'selected' : '' }}>WhatsApp</option>
+                <option value="Web Meeting" {{ old('media_konsul') === 'Web Meeting' ? 'selected' : '' }}>Web Meeting</option>
+                <option value="Daring" {{ old('media_konsul') === 'Daring' ? 'selected' : '' }}>Daring (lainnya)</option>
+            </select>
+        </div>
 
-            {{-- Baris 1: Tanggal & Waktu Bimbingan --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Tanggal Bimbingan <span class="text-red-500">*</span></label>
-                    <input type="date" name="tanggal_konsul" value="{{ old('tanggal_konsul', date('Y-m-d')) }}" required
-                           class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Waktu Bimbingan <span class="text-red-500">*</span></label>
-                    <input type="time" name="waktu_konsul" value="{{ old('waktu_konsul', date('H:i')) }}" required
-                           class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-            </div>
+        <div>
+            <label class="block font-bold text-gray-800 mb-2">Topik yang Dibahas <span class="text-red-500">*</span></label>
+            <textarea name="topik_dibahas" rows="2" required
+                      class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Contoh: Konsultasi modul pembelajaran">{{ old('topik_dibahas') }}</textarea>
+        </div>
 
-            {{-- Media Bimbingan --}}
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">Media Bimbingan <span class="text-red-500">*</span></label>
-                <select name="media_konsul" required
-                        class="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    <option value="" disabled selected>Pilih media bimbingan...</option>
-                    <option value="Tatap Muka" {{ old('media_konsul') == 'Tatap Muka' ? 'selected' : '' }}>Tatap Muka</option>
-                    <option value="Daring" {{ old('media_konsul') == 'Daring' ? 'selected' : '' }}>Daring</option>
-                </select>
-            </div>
+        <div>
+            <label class="block font-bold text-gray-800 mb-2">Refleksi Mahasiswa <span class="text-red-500">*</span></label>
+            <p class="text-xs text-gray-500 mb-2">Ceritakan hal yang Anda pahami, kendala yang dibahas, atau refleksi Anda setelah mengikuti bimbingan...</p>
+            <textarea name="refleksi_mahasiswa" rows="3" required
+                      class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Contoh: Memahami bahwa modul perlu disusun secara sistematis dan disesuaikan dengan tujuan pembelajaran">{{ old('refleksi_mahasiswa') }}</textarea>
+        </div>
 
-            {{-- Topik / Isi Konsultasi --}}
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">Topik / Isi Konsultasi <span class="text-red-500">*</span></label>
-                <textarea name="topik_dibahas" rows="4" required
-                          placeholder="Jelaskan topik atau isi konsultasi yang dibahas ada sesi bimbingan ini..."
-                          class="w-full rounded-xl border border-gray-300 p-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">{{ old('topik_dibahas') }}</textarea>
-            </div>
+        <div>
+            <label class="block font-bold text-gray-800 mb-2">Tindak Lanjut Mahasiswa</label>
+            <p class="text-xs text-gray-500 mb-2">Langkah apa yang akan kamu lakukan setelah bimbingan ini?</p>
+            <textarea name="tindak_lanjut_mahasiswa" rows="3"
+                      class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Contoh: Melakukan revisi struktur dan isi modul sesuai arahan dosen pembimbing">{{ old('tindak_lanjut_mahasiswa') }}</textarea>
+        </div>
 
-            {{-- Saran / Hasil Bimbingan dari Dosen --}}
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">Saran / Hasil Bimbingan dari Dosen <span class="text-red-500">*</span></label>
-                <textarea name="saran_dosen" rows="4" required
-                          placeholder="Tuliskan saran, masukan, atau hasil bimbingan yang diberikan oleh dosen pembimbing..."
-                          class="w-full rounded-xl border border-gray-300 p-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">{{ old('saran_dosen') }}</textarea>
-            </div>
+        <div>
+            <label class="block font-bold text-gray-800 mb-2">Saran Dosen</label>
+            <p class="text-xs text-gray-500 mb-2">Opsional, bisa diisi jika dosen sudah memberi saran langsung saat sesi ini</p>
+            <textarea name="saran_dosen" rows="2"
+                      class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Contoh: Modul perlu diperbaiki pada bagian penyajian materi">{{ old('saran_dosen') }}</textarea>
+        </div>
 
-            {{-- Tombol Aksi --}}
-            <div class="flex items-center justify-end gap-4 pt-4 border-t border-gray-100">
-                <button type="submit"
-                        class="px-8 py-3 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-md transition">
-                    Simpan Bimbingan
-                </button>
-                <a href="{{ route('mahasiswa.dashboard') }}"
-                   class="px-6 py-3 rounded-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 text-sm font-bold transition">
-                    Batal
-                </a>
-                
-            </div>
-        </form>
-    </div>
+        <div class="sm:w-1/2">
+            <label class="block font-bold text-gray-800 mb-2">Paraf Mahasiswa</label>
+            <p class="text-xs text-gray-500 mb-2">Ketik nama/inisial sebagai tanda tangan digital</p>
+            <input type="text" name="paraf_mahasiswa" value="{{ old('paraf_mahasiswa') }}"
+                   class="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                   placeholder="Contoh: Ersa M.">
+        </div>
+
+        <div class="flex justify-end gap-3 pt-2">
+            <a href="{{ route('mahasiswa.konsultasi.index') }}"
+               class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-8 py-2.5 rounded-full transition">
+                Batal
+            </a>
+            <button type="submit"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-2.5 rounded-full transition">
+                Simpan Log Bimbingan
+            </button>
+        </div>
+    </form>
 </div>
 @endsection

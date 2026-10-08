@@ -20,13 +20,16 @@ class Konsultasi extends Model
     protected $fillable = [
         'plotting_id',
         'tanggal_konsul',
-        'waktu_konsul', // BARU: jam bimbingan, format H:i:s
+        'waktu_konsul',
         'media_konsul',
         'topik_dibahas',
         'refleksi_mahasiswa',
         'saran_dosen',
+        'tindak_lanjut_mahasiswa',
+        'paraf_mahasiswa',
         'paraf_dosen',
         'status_validasi',
+        'alasan_penolakan',
     ];
 
     public function plottingBimbingan(): BelongsTo

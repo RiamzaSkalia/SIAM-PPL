@@ -31,11 +31,13 @@ class KonsultasiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'tanggal_konsul' => 'required|date',
-            'waktu_konsul' => 'required',
-            'media_konsul' => 'required',
-            'topik_dibahas' => 'required|string',
-            'saran_dosen' => 'required|string',
+            'tanggal_konsul'          => 'required|date',
+            'waktu_konsul'            => 'required',
+            'media_konsul'            => 'required',
+            'topik_dibahas'           => 'required|string',
+            'refleksi_mahasiswa'      => 'required|string',
+            'tindak_lanjut_mahasiswa' => 'nullable|string',
+            'paraf_mahasiswa'         => 'nullable|string|max:100',
         ]);
 
         $mahasiswa = Auth::user()->mahasiswa()->with('plottingBimbingan')->firstOrFail();
@@ -47,13 +49,16 @@ class KonsultasiController extends Controller
 
         // Simpan ke database dengan status default "pending" (Menunggu Verifikasi)
         Konsultasi::create([
-            'plotting_id' => $mahasiswa->plottingBimbingan->id, // FIXED: sebelumnya 'plotting_bimbingan_id'
-            'tanggal_konsul' => $request->tanggal_konsul,
-            'waktu_konsul' => $request->waktu_konsul,
-            'media_konsul' => $request->media_konsul,
-            'topik_dibahas' => $request->topik_dibahas,
-            'saran_dosen' => $request->saran_dosen,
-            'status_validasi' => 'pending', // FIXED: sebelumnya 'menunggu' (bukan value enum yang valid)
+            'plotting_id'             => $mahasiswa->plottingBimbingan->id,
+            'tanggal_konsul'          => $request->tanggal_konsul,
+            'waktu_konsul'            => $request->waktu_konsul,
+            'media_konsul'            => $request->media_konsul,
+            'topik_dibahas'           => $request->topik_dibahas,
+            'refleksi_mahasiswa'      => $request->refleksi_mahasiswa,
+            'saran_dosen'             => null, // Diisi oleh dosen saat verifikasi
+            'tindak_lanjut_mahasiswa' => $request->tindak_lanjut_mahasiswa,
+            'paraf_mahasiswa'         => $request->paraf_mahasiswa,
+            'status_validasi'         => 'pending',
         ]);
 
         return redirect()->route('mahasiswa.konsultasi.index')

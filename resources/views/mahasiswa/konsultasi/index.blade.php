@@ -17,111 +17,66 @@
     </div>
 
     <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm min-w-[900px]">
+        <table class="w-full text-left text-sm min-w-[1200px]">
             <thead>
-                <tr class="text-gray-700 border-b border-gray-200">
-                    <th class="py-3 px-4">No</th>
-                    <th class="py-3 px-4">Tanggal</th>
-                    <th class="py-3 px-4">Waktu</th>
-                    <th class="py-3 px-4">Media</th>
-                    <th class="py-3 px-4">Topik Konsultasi</th>
-                    <th class="py-3 px-4">Status</th>
-                    <th class="py-3 px-4">Aksi</th>
+                <tr class="text-gray-700 border-b border-gray-200 bg-gray-50/50">
+                    <th class="py-3 px-3">No</th>
+                    <th class="py-3 px-3">Tanggal / Waktu</th>
+                    <th class="py-3 px-3">Media/Metode Konsultasi</th>
+                    <th class="py-3 px-3">Topik Konsultasi</th>
+                    <th class="py-3 px-3">Refleksi Mahasiswa</th>
+                    <th class="py-3 px-3">Saran / Umpan Balik Dosen</th>
+                    <th class="py-3 px-3">Tindak Lanjut Mahasiswa</th>
+                    <th class="py-3 px-3">Status</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($riwayatKonsultasi ?? [] as $log)
-                    <tr class="border-b border-gray-100 hover:bg-gray-50">
-                        <td class="py-3 px-4 text-gray-500">{{ $loop->iteration }}</td>
-                        <td class="py-3 px-4 whitespace-nowrap">{{ \Carbon\Carbon::parse($log->tanggal_konsul)->format('d M Y') }}</td>
-                        <td class="py-3 px-4 whitespace-nowrap">
-                            {{ $log->waktu_konsul ? \Carbon\Carbon::parse($log->waktu_konsul)->format('H.i') : '-' }}
+                    <tr class="border-b border-gray-100 hover:bg-gray-50 align-top">
+                        <td class="py-4 px-3 text-gray-500 font-medium">{{ $loop->iteration }}</td>
+                        <td class="py-4 px-3 whitespace-nowrap">
+                            <div class="font-semibold text-gray-800">{{ \Carbon\Carbon::parse($log->tanggal_konsul)->format('d M Y') }}</div>
+                            <div class="text-xs text-gray-500 mt-0.5">
+                                {{ $log->waktu_konsul ? \Carbon\Carbon::parse($log->waktu_konsul)->format('H.i') : '-' }} WIB
+                            </div>
                         </td>
-                        <td class="py-3 px-4 whitespace-nowrap">{{ $log->media_konsul }}</td>
-                        <td class="py-3 px-4 max-w-xs">{{ $log->topik_dibahas }}</td>
-                        <td class="py-3 px-4 whitespace-nowrap">
+                        <td class="py-4 px-3 whitespace-nowrap">
+                            <span class="inline-block bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs font-semibold">
+                                {{ $log->media_konsul }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-3 max-w-[200px]">
+                            <p class="text-gray-800">{{ $log->topik_dibahas }}</p>
+                        </td>
+                        <td class="py-4 px-3 max-w-[200px]">
+                            <p class="text-gray-700">{{ $log->refleksi_mahasiswa ?? '-' }}</p>
+                        </td>
+                        <td class="py-4 px-3 max-w-[200px]">
+                            <p class="text-gray-700">{{ $log->saran_dosen ?? 'Belum diisi oleh dosen.' }}</p>
+                        </td>
+                        <td class="py-4 px-3 max-w-[200px]">
+                            <p class="text-gray-700">{{ $log->tindak_lanjut_mahasiswa ?? 'Belum diisi.' }}</p>
+                        </td>
+                        <td class="py-4 px-3 whitespace-nowrap">
                             @if ($log->status_validasi === 'disetujui')
                                 <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">Terverifikasi</span>
                             @elseif ($log->status_validasi === 'ditolak')
                                 <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold">Ditolak</span>
+                                @if ($log->alasan_penolakan)
+                                    <p class="text-xs text-red-500 mt-1">{{ $log->alasan_penolakan }}</p>
+                                @endif
                             @else
                                 <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">Menunggu</span>
                             @endif
                         </td>
-                        <td class="py-3 px-4">
-                            <button type="button"
-                                    onclick="document.getElementById('detail-{{ $log->id }}').showModal()"
-                                    class="border border-indigo-600 text-indigo-600 text-xs font-bold px-4 py-1.5 rounded-full hover:bg-indigo-600 hover:text-white transition">
-                                Lihat
-                            </button>
-
-                            <dialog id="detail-{{ $log->id }}" class="rounded-2xl p-0 w-full max-w-md backdrop:bg-black/40">
-                                <div class="p-6">
-                                    <div class="flex items-start justify-between mb-4">
-                                        <h3 class="text-lg font-extrabold text-gray-800">Detail Bimbingan</h3>
-                                        <button type="button"
-                                                onclick="document.getElementById('detail-{{ $log->id }}').close()"
-                                                class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
-                                    </div>
-
-                                    <dl class="space-y-3 text-sm">
-                                        <div>
-                                            <dt class="text-gray-500">Tanggal</dt>
-                                            <dd class="font-semibold text-gray-800">{{ \Carbon\Carbon::parse($log->tanggal_konsul)->format('d M Y') }}</dd>
-                                        </div>
-                                        <div>
-                                            <dt class="text-gray-500">Waktu</dt>
-                                            <dd class="font-semibold text-gray-800">
-                                                {{ $log->waktu_konsul ? \Carbon\Carbon::parse($log->waktu_konsul)->format('H.i') : '-' }}
-                                            </dd>
-                                        </div>
-                                        <div>
-                                            <dt class="text-gray-500">Media</dt>
-                                            <dd class="font-semibold text-gray-800">{{ $log->media_konsul }}</dd>
-                                        </div>
-                                        <div>
-                                            <dt class="text-gray-500">Topik / Isi Konsultasi</dt>
-                                            <dd class="text-gray-800">{{ $log->topik_dibahas }}</dd>
-                                        </div>
-                                        <div>
-                                            <dt class="text-gray-500">Saran Dosen</dt>
-                                            <dd class="text-gray-800">{{ $log->saran_dosen ?? '-' }}</dd>
-                                        </div>
-                                        <div>
-                                            <dt class="text-gray-500">Status Verifikasi</dt>
-                                            <dd>
-                                                @if ($log->status_validasi === 'disetujui')
-                                                    <span class="text-emerald-700 font-bold">Terverifikasi</span>
-                                                @elseif ($log->status_validasi === 'ditolak')
-                                                    <span class="text-red-700 font-bold">Ditolak</span>
-                                                @else
-                                                    <span class="text-amber-800 font-bold">Menunggu</span>
-                                                @endif
-                                            </dd>
-                                        </div>
-                                    </dl>
-
-                                    <button type="button"
-                                            onclick="document.getElementById('detail-{{ $log->id }}').close()"
-                                            class="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-full transition">
-                                        Tutup
-                                    </button>
-                                </div>
-                            </dialog>
-                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="py-8 text-center text-gray-500">Belum ada riwayat bimbingan yang tercatat.</td>
+                        <td colspan="8" class="py-8 text-center text-gray-500">Belum ada riwayat bimbingan yang tercatat.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 </div>
-
-<style>
-    dialog::backdrop { background: rgba(0,0,0,0.4); }
-    dialog { border: none; }
-</style>
 @endsection
