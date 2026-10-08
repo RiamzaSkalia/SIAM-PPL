@@ -1,49 +1,79 @@
-@extends('layouts.dosen') {{-- Sesuaikan dengan nama layout utama dosen kamu, misal layouts.app atau layouts.dosen --}}
+@extends('layouts.dosen')
 
 @section('title', 'Dashboard Dosen Pembimbing')
 @section('page-title', 'Dashboard Dosen')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Kartu Sambutan & Statistik Singkat -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div>
-            <h2 class="text-xl font-extrabold text-gray-800">Selamat Datang, Dosen Pembimbing</h2>
-            <p class="text-sm text-gray-500 mt-1">Kelola dan verifikasi log catatan konsultasi mahasiswa bimbingan Anda dengan mudah di sini.</p>
+<div class="space-y-6 max-w-7xl mx-auto">
+    
+    <!-- Banner Sambutan Utama (Biru Tua) -->
+    <div class="bg-[#333B85] text-white rounded-2xl p-6 shadow-sm">
+        <h2 class="text-xs opacity-80 font-medium">Selamat datang</h2>
+        <h1 class="text-xl font-extrabold mt-0.5">{{ $dosen->nama_dosen ?? Auth::user()->name }}</h1>
+        <p class="text-xs opacity-75 mt-1">{{ $dosen->nidn ?? '-' }} • Dosen Pembimbing</p>
+    </div>
+
+    <!-- Grid Kartu Statistik -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Kolom Kiri: 4 Kotak Statistik Kecil -->
+        <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-white rounded-2xl p-5 shadow-xs border border-gray-100">
+                <p class="text-xs text-gray-500 font-medium">Mahasiswa Bimbingan</p>
+                <h3 class="text-3xl font-extrabold text-gray-800 mt-2">{{ $jumlahMahasiswa ?? 0 }}</h3>
+            </div>
+            <div class="bg-white rounded-2xl p-5 shadow-xs border border-gray-100">
+                <p class="text-xs text-gray-500 font-medium">Total Log Bimbingan</p>
+                <h3 class="text-3xl font-extrabold text-gray-800 mt-2">{{ $totalLog ?? 0 }}</h3>
+            </div>
+            <div class="bg-white rounded-2xl p-5 shadow-xs border border-gray-100">
+                <p class="text-xs text-gray-500 font-medium">Menunggu Verifikasi</p>
+                <h3 class="text-3xl font-extrabold text-gray-800 mt-2">{{ $menungguVerifikasi ?? 0 }}</h3>
+            </div>
+            <div class="bg-white rounded-2xl p-5 shadow-xs border border-gray-100">
+                <p class="text-xs text-gray-500 font-medium">Sudah Memenuhi Syarat</p>
+                <h3 class="text-3xl font-extrabold text-gray-800 mt-2">1</h3>
+            </div>
         </div>
-        <div class="flex gap-3">
-            <div class="bg-indigo-50 border border-indigo-100 px-5 py-3 rounded-xl text-center">
-                <span class="block text-xs text-indigo-600 font-bold uppercase tracking-wider">Menunggu Verifikasi</span>
-                <span class="text-2xl font-extrabold text-indigo-700">0</span>
+
+        <!-- Kolom Kanan: Kotak Informasi Tambahan -->
+        <div class="bg-white rounded-2xl p-6 shadow-xs border border-gray-100 flex flex-col justify-between">
+            <div>
+                <h4 class="text-xs text-gray-400 font-bold uppercase tracking-wider">Status Dosen</h4>
+                <h3 class="text-base font-extrabold text-gray-800 mt-1">Pembimbing Aktif</h3>
+                <p class="text-xs text-gray-500 mt-2">Pastikan untuk memeriksa log bimbingan mahasiswa secara berkala.</p>
             </div>
         </div>
     </div>
 
-    <!-- Tabel / Daftar Log Bimbingan Mahasiswa yang Perlu Dicek -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h3 class="text-lg font-bold text-gray-800 mb-4">Daftar Bimbingan Mahasiswa</h3>
-        
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm min-w-[900px]">
-                <thead>
-                    <tr class="text-gray-700 border-b border-gray-200 bg-gray-50/50">
-                        <th class="py-3 px-4">No</th>
-                        <th class="py-3 px-4">Mahasiswa</th>
-                        <th class="py-3 px-4">Tanggal / Waktu</th>
-                        <th class="py-3 px-4">Topik Konsultasi</th>
-                        <th class="py-3 px-4">Status</th>
-                        <th class="py-3 px-4">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="6" class="py-8 text-center text-gray-500">
-                            Belum ada data bimbingan mahasiswa yang masuk.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <!-- Kotak Daftar Log Menunggu Verifikasi -->
+    <div class="bg-white rounded-2xl shadow-xs border border-gray-100 p-6 space-y-4">
+        <div>
+            <h3 class="text-base font-extrabold text-gray-800">Log Menunggu Verifikasi</h3>
+            <p class="text-xs text-gray-500 mt-0.5">Terdapat {{ $menungguVerifikasi ?? 0 }} log bimbingan yang belum diverifikasi</p>
+        </div>
+
+        <div class="space-y-3">
+            @forelse ($logMenunggu ?? [] as $log)
+                <div class="bg-amber-50/40 border border-amber-100/80 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <h4 class="font-extrabold text-gray-900 text-sm">{{ $log->mahasiswa->nama_mahasiswa ?? 'Mahasiswa' }}</h4>
+                        <p class="text-xs text-gray-500 mt-0.5">
+                            {{ \Carbon\Carbon::parse($log->tanggal_konsul)->format('d F Y') }} • {{ $log->topik_dibahas }}
+                        </p>
+                    </div>
+                    <div>
+                        <a href="#" class="bg-[#333B85] hover:bg-indigo-900 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs transition inline-block">
+                            Verifikasi
+                        </a>
+                    </div>
+                </div>
+            @empty
+                <div class="text-center py-8 text-gray-400 text-sm">
+                    Tidak ada log bimbingan yang menunggu verifikasi saat ini.
+                </div>
+            @endforelse
         </div>
     </div>
+
 </div>
 @endsection

@@ -102,6 +102,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{konsultasi}/setujui', 'setujui')->name('setujui');
             Route::post('/{konsultasi}/tolak', 'tolak')->name('tolak');
         });
+
+        Route::get('/mahasiswa-bimbingan', [DosenDashboardController::class, 'mahasiswaBimbingan'])->name('mahasiswa.bimbingan');
+        Route::get('/mahasiswa-bimbingan/{id}', [DosenDashboardController::class, 'detailMahasiswa'])->name('mahasiswa.detail');
     });
 
 });
