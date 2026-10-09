@@ -12,28 +12,37 @@ use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
 {
+    // Method untuk Menampilkan Form Registrasi (Mendukung showRegisterForm & showRegistrationForm)
     public function showRegisterForm()
     {
         return view('auth.register_pamong');
     }
 
+    public function showRegistrationForm()
+    {
+        return $this->showRegisterForm();
+    }
+
+    // Method untuk Memproses Pendaftaran (Mendukung register & store)
     public function register(Request $request)
     {
         $request->validate([
-            'npsn'              => 'required|exists:sekolah_mitra,npsn',
-            'nip_nik'           => 'required|unique:guru_pamong,nip_nik|unique:users,username',
-            'nama_guru_pamong'  => 'required|string|max:255',
-            'no_hp'             => 'required|string|max:20',
-            'password'          => 'required|string|min:4|confirmed',
+            'npsn'             => 'required|exists:sekolah_mitra,npsn',
+            'nip_nik'          => 'required|string|unique:users,username',
+            'nama_guru_pamong' => 'required|string|max:255',
+            'no_hp'            => 'required|string|max:20',
+            'password'         => 'required|string|min:4|confirmed',
         ], [
-            'npsn.exists'       => 'NPSN Sekolah Mitra tidak terdaftar di sistem! Hubungi Koordinator.',
-            'nip_nik.unique'    => 'NIP/NIK ini sudah terdaftar sebagai akun.',
-            'password.confirmed'=> 'Konfirmasi password tidak cocok.',
+            'npsn.exists'        => 'NPSN Sekolah tidak ditemukan di sistem! Silakan hubungi Admin.',
+            'nip_nik.unique'     => 'NIP/NIK ini sudah terdaftar.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
+        // Cari Sekolah berdasarkan NPSN
         $sekolah = SekolahMitra::where('npsn', $request->npsn)->first();
 
         DB::transaction(function () use ($request, $sekolah) {
+            // 1. Buat Akun User
             $user = User::create([
                 'name'     => $request->nama_guru_pamong,
                 'username' => $request->nip_nik,
@@ -41,6 +50,7 @@ class RegisterController extends Controller
                 'role'     => 'gupam',
             ]);
 
+            // 2. Buat Data Guru Pamong (Otomatis terhubung ke Sekolah Mitra)
             GuruPamong::create([
                 'user_id'          => $user->id,
                 'sekolah_id'       => $sekolah->id,
@@ -50,6 +60,11 @@ class RegisterController extends Controller
             ]);
         });
 
-        return redirect()->route('login')->with('success', 'Pendaftaran Guru Pamong berhasil! Silakan login.');
+        return redirect()->route('login')->with('success', 'Pendaftaran Guru Pamong berhasil! Nama Anda otomatis terhubung ke sekolah. Silakan login.');
+    }
+
+    public function store(Request $request)
+    {
+        return $this->register($request);
     }
 }

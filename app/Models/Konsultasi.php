@@ -43,10 +43,6 @@ class Konsultasi extends Model
         return $this->plottingBimbingan();
     }
 
-    public function komentarGupam(): HasMany
-    {
-        return $this->hasMany(KomentarGupam::class, 'konsultasi_id');
-    }
 
     public function setujui(string $parafDosen): void
     {

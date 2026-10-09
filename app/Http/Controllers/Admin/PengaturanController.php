@@ -31,22 +31,27 @@ class PengaturanController extends Controller
     }
 
     // Tambah Periode Baru (Ganjil/Genap)
+    // Tambah Periode Baru (Otomatis Set Sebagai Periode Aktif)
     public function storePeriode(Request $request)
     {
         $request->validate([
-            'nama_periode'   => 'required|string|max:255',
+            'nama_periode'    => 'required|string|max:255',
             'tanggal_mulai'   => 'required|date',
             'tanggal_selesai' => 'required|date',
         ]);
 
+        // 1. Ubah status semua periode sebelumnya menjadi 'nonaktif'
+        PeriodeAkademik::query()->update(['status' => 'nonaktif']);
+
+        // 2. Buat periode baru dengan status 'aktif'
         PeriodeAkademik::create([
-            'nama_periode'   => $request->nama_periode,
+            'nama_periode'    => $request->nama_periode,
             'tanggal_mulai'   => $request->tanggal_mulai,
             'tanggal_selesai' => $request->tanggal_selesai,
-            'status'          => 'nonaktif',
+            'status'          => 'aktif', // Otomatis Aktif
         ]);
 
-        return redirect()->back()->with('success', 'Periode akademik baru berhasil ditambahkan!');
+        return redirect()->back()->with('success', 'Periode akademik baru berhasil ditambahkan dan langsung diaktifkan!');
     }
 
     // Simpan Konfigurasi Kop & TTD Lembar Pengesahan

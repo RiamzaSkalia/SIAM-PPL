@@ -40,15 +40,9 @@
                     <input type="text" name="no_hp" class="form-control form-control-custom mb-3" placeholder="Contoh: 081234567890" value="{{ old('no_hp', $mahasiswa->no_hp ?? '') }}">
                 </div>
                 <div class="col-md-6">
-                    <label class="fw-bold mb-1 fs-6">Periode Akademik Aktif <span class="text-danger">*</span></label>
-                    <select name="periode_id" class="form-select rounded-3 p-2" required>
-                        <option value="">-- Pilih Periode --</option>
-                        @foreach($periode as $p)
-                            <option value="{{ $p->id }}" {{ (old('periode_id', $mahasiswa->periode_id ?? '') == $p->id) ? 'selected' : '' }}>
-                                {{ $p->nama_periode }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <label class="fw-bold mb-1 fs-6">Periode Akademik</label>
+                    <input type="text" class="form-control rounded-3 p-2 bg-light" value="{{ $activePeriode->nama_periode ?? 'Periode Aktif' }}" readonly>
+                    <small class="text-muted">*Otomatis mengikuti periode aktif sistem saat ini.</small>
                 </div>
             </div>
         </div>

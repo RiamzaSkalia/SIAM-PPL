@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Mahasiswa;
 
 use App\Http\Controllers\Controller;
-use App\Models\Mahasiswa;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -11,40 +11,37 @@ class DashboardController extends Controller
 {
     public function index(): View
     {
-        $mahasiswa = Auth::user()
-            ->mahasiswa()
-            ->with(['plottingBimbingan.dosen', 'plottingBimbingan.guruPamong', 'plottingBimbingan.sekolahMitra'])
-            ->firstOrFail();
+        // 1. Ambil data mahasiswa terhubung dengan akun user
+        $mahasiswa = Auth::user()->mahasiswa;
 
-        $plotting = $mahasiswa->plottingBimbingan;
+        if (!$mahasiswa) {
+            abort(404, 'Data Mahasiswa tidak ditemukan untuk akun ini.');
+        }
 
-        // Jika mahasiswa belum di-plotting ke dosen/gupam/sekolah oleh admin,
-        // belum ada konsultasi sama sekali.
+        // 2. Ambil plotting bimbingan mahasiswa (beserta Dosen, Sekolah, dan Guru Pamong)
+        $plotting = $mahasiswa->plottingBimbingan()
+            ->with(['dosen', 'sekolah.guruPamong', 'periode'])
+            ->first();
+
+        // 3. Ambil riwayat konsultasi dari plotting
         $riwayatKonsultasi = $plotting
             ? $plotting->konsultasi()->orderByDesc('tanggal_konsul')->get()
             : collect();
 
-        // --- Logika perhitungan dinamis ---
+        // 4. Statistik Konsultasi
         $totalKonsultasi  = $riwayatKonsultasi->count();
-        $totalDisetujui   = $riwayatKonsultasi->where('status_validasi', 'disetujui')->count();
-        $totalPending     = $riwayatKonsultasi->where('status_validasi', 'pending')->count();
-        $totalDitolak     = $riwayatKonsultasi->where('status_validasi', 'ditolak')->count();
+        $disetujuiCount   = $riwayatKonsultasi->where('status_validasi', 'disetujui')->count();
+        $menungguCount    = $riwayatKonsultasi->where('status_validasi', 'menunggu')->count();
+        $ditolakCount     = $riwayatKonsultasi->where('status_validasi', 'ditolak')->count();
 
-        // Syarat minimal dihitung dari yang statusnya SUDAH DISETUJUI saja
-        $syaratTerpenuhi  = $totalDisetujui >= Mahasiswa::MINIMAL_KONSULTASI;
-        $sisaMenujuSyarat = max(Mahasiswa::MINIMAL_KONSULTASI - $totalDisetujui, 0);
-
-        return view('mahasiswa.dashboard', [
-            'mahasiswa'          => $mahasiswa,
-            'plotting'           => $plotting,
-            'riwayatKonsultasi'  => $riwayatKonsultasi,
-            'totalKonsultasi'    => $totalKonsultasi,
-            'totalDisetujui'     => $totalDisetujui,
-            'totalPending'       => $totalPending,
-            'totalDitolak'       => $totalDitolak,
-            'minimalKonsultasi'  => Mahasiswa::MINIMAL_KONSULTASI,
-            'syaratTerpenuhi'    => $syaratTerpenuhi,
-            'sisaMenujuSyarat'   => $sisaMenujuSyarat,
-        ]);
+        return view('mahasiswa.dashboard', compact(
+            'mahasiswa',
+            'plotting',
+            'riwayatKonsultasi',
+            'totalKonsultasi',
+            'disetujuiCount',
+            'menungguCount',
+            'ditolakCount'
+        ));
     }
 }

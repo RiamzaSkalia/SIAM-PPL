@@ -61,7 +61,7 @@
             <span class="fw-bold text-success">{{ $persenLayak }}% ({{ $mahasiswaLayak }} / {{ $totalMahasiswa }} Mhs)</span>
         </div>
         <div class="progress rounded-pill" style="height: 12px;">
-            <div class="progress-bar bg-success" role="progressbar" style="width: {{ $persenLayak }}%;"></div>
+            <div class="progress-bar bg-success" role="progressbar" @style(['width' => $persenLayak . '%'])></div>
         </div>
     </div>
 
@@ -71,7 +71,7 @@
             <span class="fw-bold text-danger">{{ $persenBelumLayak }}% ({{ $mahasiswaBelumLayak }} / {{ $totalMahasiswa }} Mhs)</span>
         </div>
         <div class="progress rounded-pill" style="height: 12px;">
-            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ $persenBelumLayak }}%;"></div>
+            <div class="progress-bar bg-danger" role="progressbar" @style(['width' => $persenBelumLayak . '%'])></div>
         </div>
     </div>
 </div>

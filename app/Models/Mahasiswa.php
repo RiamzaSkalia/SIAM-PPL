@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Mahasiswa extends Model
 {
@@ -11,32 +12,28 @@ class Mahasiswa extends Model
 
     protected $table = 'mahasiswa';
 
-    public const MINIMAL_KONSULTASI = 5; 
-
     protected $fillable = [
         'user_id',
+        'periode_id',
         'nim',
         'nama_mahasiswa',
         'no_hp',
-        'prodi',
-        'semester',
-        'angkatan',
     ];
 
-    public function user()
+    // Relasi Banyak ke Banyak melalui pivot plotting_mahasiswa
+    public function plottingBimbingan(): BelongsToMany
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(
+            PlottingBimbingan::class,
+            'plotting_mahasiswa',
+            'mahasiswa_id',
+            'plotting_id'
+        );
     }
 
-    public function plotting()
+    // Alias relasi agar kompatibel
+    public function plotting(): BelongsToMany
     {
-        return $this->belongsToMany(PlottingBimbingan::class, 'plotting_mahasiswa', 'mahasiswa_id', 'plotting_id');
-    }
-
-    // BARU: relasi langsung ke plotting_bimbingan sesuai kolom mahasiswa_id
-    // (dipakai oleh DashboardController dan KonsultasiController)
-    public function plottingBimbingan()
-    {
-        return $this->hasOne(PlottingBimbingan::class, 'mahasiswa_id');
+        return $this->plottingBimbingan();
     }
 }

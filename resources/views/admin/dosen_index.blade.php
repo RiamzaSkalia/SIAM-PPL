@@ -15,6 +15,11 @@
         <button type="button" class="btn-close btn-close-white ms-auto" onclick="closeNotification()" aria-label="Close"></button>
     </div>
 @endif
+@if(session('error'))
+    <div class="alert alert-danger rounded-4 px-4 py-3 mb-3 shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+    </div>
+@endif
 
 <div class="p-3" style="background-color: #f7ede2; border-radius: 12px;">
     <h6 class="fw-bold mb-3"><i class="bi bi-people-fill"></i> Kelola Data Dosen Pembimbing</h6>
