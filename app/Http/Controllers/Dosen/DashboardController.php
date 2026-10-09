@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dosen;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use App\Models\Dosen;
 use App\Models\Mahasiswa;
@@ -12,9 +13,6 @@ use App\Models\Konsultasi;
 
 class DashboardController extends Controller
 {
-    /**
-     * Helper untuk mengambil data Dosen yang sedang login.
-     */
     private function getDosen(): ?Dosen
     {
         return Dosen::where('user_id', Auth::id())->first();
@@ -30,11 +28,17 @@ class DashboardController extends Controller
         $logMenunggu = collect();
 
         if ($dosen) {
-            $mahasiswaIds = PlottingBimbingan::where('dosen_id', $dosen->id)->pluck('mahasiswa_id');
-            $jumlahMahasiswa = $mahasiswaIds->count();
+            // 1. Ambil seluruh ID plotting milik dosen ini
+            $plottingIds = PlottingBimbingan::where('dosen_id', $dosen->id)->pluck('id');
 
-            $logBimbingan = Konsultasi::whereIn('mahasiswa_id', $mahasiswaIds)
-                ->with('mahasiswa')
+            // 2. Hitung jumlah mahasiswa bimbingan dari tabel pivot 'plotting_mahasiswa'
+            $jumlahMahasiswa = DB::table('plotting_mahasiswa')
+                ->whereIn('plotting_id', $plottingIds)
+                ->count();
+
+            // 3. Ambil log konsultasi berdasarkan 'plotting_id'
+            $logBimbingan = Konsultasi::whereIn('plotting_id', $plottingIds)
+                ->latest()
                 ->get();
                 
             $totalLog = $logBimbingan->count();
@@ -57,11 +61,20 @@ class DashboardController extends Controller
         $mahasiswas = collect();
 
         if ($dosen) {
-            $mahasiswaIds = PlottingBimbingan::where('dosen_id', $dosen->id)->pluck('mahasiswa_id');
+            $plottingIds = PlottingBimbingan::where('dosen_id', $dosen->id)->pluck('id');
+
+            $mahasiswaIds = DB::table('plotting_mahasiswa')
+                ->whereIn('plotting_id', $plottingIds)
+                ->pluck('mahasiswa_id');
+
             $mahasiswas = Mahasiswa::whereIn('id', $mahasiswaIds)->get();
 
             foreach ($mahasiswas as $mhs) {
-                $mhs->jumlah_bimbingan = Konsultasi::where('mahasiswa_id', $mhs->id)
+                $mhsPlottingIds = DB::table('plotting_mahasiswa')
+                    ->where('mahasiswa_id', $mhs->id)
+                    ->pluck('plotting_id');
+
+                $mhs->jumlah_bimbingan = Konsultasi::whereIn('plotting_id', $mhsPlottingIds)
                     ->where('status_validasi', 'disetujui')
                     ->count();
                 $mhs->status_memenuhi = $mhs->jumlah_bimbingan >= 5;
@@ -75,8 +88,12 @@ class DashboardController extends Controller
     {
         $dosen = $this->getDosen();
         $mahasiswa = Mahasiswa::findOrFail($id);
+
+        $mhsPlottingIds = DB::table('plotting_mahasiswa')
+            ->where('mahasiswa_id', $id)
+            ->pluck('plotting_id');
         
-        $konsultasis = Konsultasi::where('mahasiswa_id', $id)
+        $konsultasis = Konsultasi::whereIn('plotting_id', $mhsPlottingIds)
             ->latest()
             ->get();
         
