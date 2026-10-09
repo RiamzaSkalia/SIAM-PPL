@@ -4,7 +4,7 @@
 <!-- SALAM PEMBUKA & HEADING DASHBOARD -->
 <div class="mb-4">
     <h3 class="fw-bold m-0" style="color: #2b3990;">
-        Selamat Datang, {{ $mahasiswa->nama_mahasiswa ?? Auth::user()->name }}! 👋
+        Selamat Datang, {{ $mahasiswa->nama_mahasiswa ?? Auth::user()->name }}!
     </h3>
     <p class="text-muted fs-6 m-0">
         Program Asistensi Mengajar {{ $plotting->periode->nama_periode ?? '2025/2026' }} — Pendidikan Komputer (PILKOM ULM)
@@ -17,21 +17,21 @@
         <div class="col-md-4 d-flex align-items-center">
             <i class="bi bi-person-badge fs-2 me-3" style="color: #3b31b2;"></i>
             <div>
-                <small class="text-muted d-block fw-semibold">👨‍🏫 Dosen Pembimbing Lapangan (DPL)</small>
+                <small class="text-muted d-block fw-semibold">Dosen Pembimbing Lapangan (DPL)</small>
                 <strong class="text-dark fs-6">{{ $plotting->dosen->nama_dosen ?? 'Belum Di-plotting' }}</strong>
             </div>
         </div>
         <div class="col-md-4 d-flex align-items-center">
             <i class="bi bi-person-check fs-2 me-3" style="color: #28a745;"></i>
             <div>
-                <small class="text-muted d-block fw-semibold">👩‍🏫 Guru Pamong Sekolah</small>
+                <small class="text-muted d-block fw-semibold">Guru Pamong Sekolah</small>
                 <strong class="text-dark fs-6">{{ $plotting->sekolah->guruPamong->nama_guru_pamong ?? 'Belum terdaftar' }}</strong>
             </div>
         </div>
         <div class="col-md-4 d-flex align-items-center">
             <i class="bi bi-building fs-2 me-3" style="color: #fd7e14;"></i>
             <div>
-                <small class="text-muted d-block fw-semibold">🏫 Sekolah Penugasan</small>
+                <small class="text-muted d-block fw-semibold">Sekolah Penugasan</small>
                 <strong class="text-dark fs-6">{{ $plotting->sekolah->nama_sekolah ?? 'Belum ditentukan' }}</strong> 
                 <small class="text-muted">({{ $plotting->sekolah->jenjang ?? '-' }})</small>
             </div>
@@ -45,7 +45,7 @@
     <div class="col-lg-7">
         <div class="card card-custom p-4 h-100 shadow-sm">
             <h6 class="fw-bold mb-3" style="color: #2b3990;">
-                📊 PROGRESS KONSULTASI BIMBINGAN
+                ROGRESS KONSULTASI BIMBINGAN
             </h6>
             
             <div class="d-flex justify-content-between align-items-center mb-1">
@@ -55,8 +55,8 @@
 
             <div class="progress mb-4" style="height: 14px; border-radius: 10px; background-color: #e9ecef;">
                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" 
-                     @style(['width' => $persenProgress . '%', 'background-color' => '#3b31b2',])
-                     aria-valuenow="{{ $persenProgress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    @style(['width: ' . $persenProgress . '%', 'background-color: #3b31b2'])
+                    aria-valuenow="{{ $persenProgress }}" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
 
             <div class="row text-center pt-2 border-top">
@@ -81,7 +81,7 @@
         <div class="card card-custom p-4 h-100 shadow-sm text-center d-flex flex-column justify-content-between" style="background-color: #f8fafc;">
             <div>
                 <h6 class="fw-bold mb-3 text-start" style="color: #2b3990;">
-                    📄 STATUS KARTU KONSULTASI (PDF)
+                    STATUS KARTU KONSULTASI (PDF)
                 </h6>
 
                 @if($isEligible)
@@ -144,7 +144,7 @@
                     <td class="text-start py-3 fw-semibold">{{ $item->topik_dibahas }}</td>
                     <td class="py-3">
                         @if($item->status_validasi == 'disetujui')
-                            <span class="badge bg-success rounded-pill px-3 py-2">🟢 Disetujui (Paraf Digital ✅)</span>
+                            <span class="badge bg-success rounded-pill px-3 py-2">🟢 Disetujui</span>
                         @elseif($item->status_validasi == 'ditolak')
                             <span class="badge bg-danger rounded-pill px-3 py-2">🔴 Ditolak</span>
                         @else
@@ -154,7 +154,7 @@
                     <td class="text-start py-3">{{ $item->saran_dosen ?? '-' }}</td>
                     <td class="py-3">
                         <a href="{{ route('mahasiswa.konsultasi.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">
-                            👁️ Detail
+                            Detail
                         </a>
                     </td>
                 </tr>
