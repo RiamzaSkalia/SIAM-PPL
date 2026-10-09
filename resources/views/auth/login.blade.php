@@ -81,9 +81,8 @@
 <div class="glass-card text-center">
     <!-- Logo & Title -->
     <div class="mb-4">
-        <div class="d-inline-block p-2 rounded-circle mb-2" style="background: rgba(30, 27, 75, 0.8);">
-            <i class="bi bi-mortarboard-fill text-white fs-2 px-1"></i>
-        </div>
+        <img src="{{ asset('images/logo-siam.png') }}" alt="Logo SIAM" class="mb-2" style="max-height: 85px; width: auto;">
+        
         <h3 class="fw-bold text-white mb-0" style="letter-spacing: 1px;">SIAM</h3>
         <small class="text-white-50" style="font-size: 12px;">Sistem Informasi Asistensi Mengajar</small>
     </div>
