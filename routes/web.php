@@ -30,6 +30,7 @@ Route::controller(RegisterController::class)->prefix('pamong')->name('pamong.')-
 });
 
 
+
 Route::middleware(['auth'])->group(function () {
 
     Route::prefix('admin')->name('admin.')->group(function () {
@@ -86,6 +87,10 @@ Route::middleware(['auth'])->group(function () {
     // MAHASISWA ROUTES
     Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
         Route::get('/dashboard', [MahasiswaDashboardController::class, 'index'])->name('dashboard');
+
+        // Route Halaman & Cetak Kartu
+        Route::get('/kartu-konsultasi', [MahasiswaDashboardController::class, 'halamanKartu'])->name('kartu');
+        Route::get('/kartu-konsultasi/cetak', [MahasiswaDashboardController::class, 'cetakKartu'])->name('kartu.cetak');
 
         Route::controller(KonsultasiController::class)->prefix('konsultasi')->name('konsultasi.')->group(function () {
             Route::get('/', 'index')->name('index');

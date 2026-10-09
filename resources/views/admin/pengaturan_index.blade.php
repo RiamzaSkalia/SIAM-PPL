@@ -62,48 +62,37 @@
     </ul>
 </div>
 
-{{-- SECTION 2: TEMPLATE KOP SURAT & LEMBAR PENGESAHAN --}}
+{{-- SECTION 2: TEMPLATE KOP SURAT --}}
 <div class="p-4" style="background-color: #f7ede2; border-radius: 12px;">
-    <h6 class="fw-bold mb-3" style="color: #2b3990;">📄 TEMPLATE CETAK KARTU KONSULTASI PDF (KOP & LEMBAR PENGESAHAN)</h6>
+    <h6 class="fw-bold mb-3" style="color: #2b3990;">📄 TEMPLATE CETAK KARTU KONSULTASI PDF (KOP SURAT)</h6>
     <hr>
 
-    <form action="{{ route('admin.pengaturan.update') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.pengaturan.update') }}" method="POST">
         @csrf
 
-        <div class="mb-4">
-            <label class="fw-bold mb-1">Logo Instansi / Kampus:</label>
-            <div class="d-flex align-items-center gap-3">
-                @if($pengaturan->logo_path)
-                    <img src="{{ asset('storage/' . $pengaturan->logo_path) }}" alt="Logo" style="height: 60px;">
-                @else
-                    <span class="text-muted fs-7">Belum ada logo diunggah.</span>
-                @endif
-                <input type="file" name="logo" class="form-control rounded-3" style="max-width: 300px;">
-            </div>
+        <div class="mb-3">
+            <label class="fw-bold mb-1 small">Header Teks Kop Surat Baris 1:</label>
+            <input type="text" name="header_1" class="form-control rounded-3 mb-2" value="{{ old('header_1', $pengaturan->header_1 ?? $pengaturan->header_line_1 ?? 'KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN TEKNOLOGI') }}" placeholder="Baris 1" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-bold mb-1 small">Header Teks Kop Surat Baris 2:</label>
+            <input type="text" name="header_2" class="form-control rounded-3 mb-2" value="{{ old('header_2', $pengaturan->header_2 ?? $pengaturan->header_line_2 ?? 'UNIVERSITAS LAMBUNG MANGKURAT') }}" placeholder="Baris 2" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-bold mb-1 small">Header Teks Kop Surat Baris 3:</label>
+            <input type="text" name="header_3" class="form-control rounded-3 mb-2" value="{{ old('header_3', $pengaturan->header_3 ?? $pengaturan->header_line_3 ?? 'FAKULTAS KEGURUAN DAN ILMU PENDIDIKAN') }}" placeholder="Baris 3" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-bold mb-1 small">Header Teks Kop Surat Baris 4:</label>
+            <input type="text" name="header_4" class="form-control rounded-3 mb-2" value="{{ old('header_4', $pengaturan->header_4 ?? $pengaturan->header_line_4 ?? 'JURUSAN PENDIDIKAN KOMPUTER') }}" placeholder="Baris 4" required>
         </div>
 
         <div class="mb-4">
-            <label class="fw-bold mb-2">Header Teks Kop Surat:</label>
-            <input type="text" name="header_1" class="form-control rounded-3 mb-2" value="{{ old('header_1', $pengaturan->header_1 ?? 'KEMENTERIAN PENDIDIKAN, KEBUDAYAAN, RISET, DAN TEKNOLOGI') }}" placeholder="Baris 1">
-            <input type="text" name="header_2" class="form-control rounded-3 mb-2" value="{{ old('header_2', $pengaturan->header_2 ?? 'UNIVERSITAS LAMBUNG MANGKURAT') }}" placeholder="Baris 2">
-            <input type="text" name="header_3" class="form-control rounded-3 mb-2" value="{{ old('header_3', $pengaturan->header_3 ?? 'FAKULTAS KEGURUAN DAN ILMU PENDIDIKAN') }}" placeholder="Baris 3">
-            <input type="text" name="header_4" class="form-control rounded-3 mb-2" value="{{ old('header_4', $pengaturan->header_4 ?? 'JURUSAN PENDIDIKAN KOMPUTER') }}" placeholder="Baris 4">
-            <input type="text" name="header_5" class="form-control rounded-3" value="{{ old('header_5', $pengaturan->header_5 ?? 'Jalan Brigjen H. Hasan Basry Banjarmasin 70123') }}" placeholder="Baris 5 (Alamat / Kontak)">
-        </div>
-
-        <div class="mb-4">
-            <label class="fw-bold mb-2">Penandatangan Lembar Pengesahan (Footer Dokumen):</label>
-            <div class="row g-2">
-                <div class="col-md-4">
-                    <input type="text" name="ttd_jabatan" class="form-control rounded-3" value="{{ old('ttd_jabatan', $pengaturan->ttd_jabatan ?? 'Koordinator Program Studi Pendidikan Komputer') }}" placeholder="Jabatan">
-                </div>
-                <div class="col-md-4">
-                    <input type="text" name="ttd_nama" class="form-control rounded-3" value="{{ old('ttd_nama', $pengaturan->ttd_nama ?? 'Dr. Harja Santanapurba, M.Kom Ph.D.') }}" placeholder="Nama Lengkap & Gelar">
-                </div>
-                <div class="col-md-4">
-                    <input type="text" name="ttd_nip" class="form-control rounded-3" value="{{ old('ttd_nip', $pengaturan->ttd_nip ?? '197801232005011002') }}" placeholder="NIP">
-                </div>
-            </div>
+            <label class="fw-bold mb-1 small">Alamat / Kontak (Baris 5):</label>
+            <input type="text" name="header_5" class="form-control rounded-3" value="{{ old('header_5', $pengaturan->header_5 ?? $pengaturan->header_line_5 ?? 'Jalan Brigjen H. Hasan Basry Banjarmasin 70123 Telepon: (0511) 3304914, Laman: pilkom.ulm.ac.id, Email: pilkom@ulm.ac.id') }}" placeholder="Baris 5 (Alamat / Kontak)" required>
         </div>
 
         <div class="d-flex justify-content-end">

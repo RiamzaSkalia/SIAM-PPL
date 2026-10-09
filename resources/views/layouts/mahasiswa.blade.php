@@ -3,99 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'SIAM Mahasiswa')</title>
+    <title>SIAM Mahasiswa</title>
     
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'siam-cream': '#F9F8F6',
-                        'siam-navy': '#363E78',
-                        'siam-orange': '#FBBF51',
-                        'siam-orange-dark': '#E5AB3C',
-                        'siam-green': '#10B981',
-                    }
-                }
-            }
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        body { background-color: #fcf8f2; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 15px; color: #333; }
+        .sidebar { width: 230px; background-color: #3b31b2; min-height: 100vh; padding: 20px 12px; color: white; position: fixed; top: 0; left: 0; z-index: 100; }
+        .main-content { margin-left: 230px; padding: 35px 40px; width: calc(100% - 230px); }
+        
+        .user-profile-badge {
+            background-color: #f7bb53; color: #1e1b4b; text-align: center;
+            padding: 10px 12px; border-radius: 20px; font-weight: bold; margin-bottom: 20px;
+            font-size: 14px; border: none; width: 100%; display: block; text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-    </script>
+        
+        .nav-btn {
+            display: block; width: 100%; background-color: #f7bb53; color: #1e1b4b; text-align: center;
+            padding: 10px 14px; border-radius: 20px; font-weight: bold; margin-bottom: 12px; text-decoration: none;
+            font-size: 14px; border: none; transition: all 0.2s ease;
+        }
+        .nav-btn.active { background-color: #ffffff; color: #3b31b2; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .nav-btn-logout { background-color: #f7bb53; color: #1e1b4b; margin-top: 40px; }
+        .nav-btn-logout:hover { background-color: #e2a83e; }
+        
+        .card-custom { background-color: #ffffff; border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.03); width: 100%; }
+        .form-control, .form-select { border-radius: 10px; border: 1px solid #ced4da; padding: 12px 16px; font-size: 15px; }
+        .form-control:focus, .form-select:focus { border-color: #3b31b2; box-shadow: 0 0 0 0.2rem rgba(59, 49, 178, 0.15); }
+    </style>
 </head>
-<body class="bg-siam-cream min-h-screen">
-    <div class="flex min-h-screen">
+<body>
 
-        {{-- SIDEBAR KHUSUS MAHASISWA --}}
-        <aside class="w-72 bg-siam-navy flex flex-col justify-between py-6 px-5 shrink-0 shadow-lg">
-            <div>
-                {{-- Logo & Judul SIAM --}}
-                <div class="flex items-center gap-3 text-white mb-8 px-1">
-                    <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4.34L12 21l7-3.48v-4.34l-7 3.82-7-3.82z"/>
-                        </svg>
-                    </div>
-                    <div class="leading-tight">
-                        <p class="font-extrabold text-xl tracking-wide text-white">SIAM</p>
-                        <p class="text-xs text-white/80 font-medium">Mahasiswa</p>
-                    </div>
-                </div>
-
-                <nav class="flex flex-col gap-3">
-                    {{-- Nama mahasiswa / Identitas di Sidebar --}}
-                    <div class="text-sm font-bold text-center py-3 px-4 rounded-full bg-siam-orange text-gray-900 shadow-sm">
-                        {{ auth()->user()->mahasiswa->nama_mahasiswa ?? auth()->user()->name }}
-                    </div>
-
-                    @php
-                        $menu = [
-                            ['label' => 'Dashboard', 'route' => 'mahasiswa.dashboard'],
-                            ['label' => 'Tambah Log Bimbingan', 'route' => 'mahasiswa.konsultasi.create'],
-                            ['label' => 'Riwayat Bimbingan', 'route' => 'mahasiswa.konsultasi.index'],
-                            ['label' => 'Kartu Konsultasi', 'route' => 'mahasiswa.kartu.cetak'],
-                        ];
-                    @endphp
-
-                    @foreach ($menu as $item)
-                        @php $active = request()->routeIs($item['route']); @endphp
-                        <a href="{{ Route::has($item['route']) ? route($item['route']) : '#' }}"
-                           class="text-sm font-bold text-center py-3 px-4 rounded-full transition shadow-sm
-                                {{ $active
-                                    ? 'bg-white text-gray-900 shadow-md'
-                                    : 'bg-siam-orange text-gray-900 hover:bg-siam-orange-dark' }}">
-                            {{ $item['label'] }}
-                        </a>
-                    @endforeach
-                </nav>
-            </div>
-
-            {{-- TOMBOL LOGOUT --}}
-            <form method="POST" action="{{ Route::has('logout') ? route('logout') : '#' }}">
-                @csrf
-                <button type="submit"
-                        class="w-full bg-siam-orange hover:bg-siam-orange-dark text-gray-900 text-sm font-bold py-3 px-4 rounded-full transition shadow-sm">
-                    LOG OUT
-                </button>
-            </form>
-        </aside>
-
-        {{-- KONTEN UTAMA --}}
-        <main class="flex-1 flex flex-col">
-            <div class="bg-white px-8 py-5 border-b border-gray-100 shadow-sm">
-                <h1 class="text-xl font-bold text-gray-800">@yield('page-title')</h1>
-            </div>
-
-            <div class="p-8 flex-1">
-                @if (session('success'))
-                    <div class="mb-4 rounded-lg bg-siam-green/10 border border-siam-green text-siam-green px-4 py-3 text-sm font-medium">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                @yield('content')
-            </div>
-        </main>
+<div class="sidebar">
+    <div class="text-center mb-4">
+        <i class="bi bi-mortarboard-fill fs-2"></i>
+        <h5 class="fw-bold m-0">SIAM</h5>
+        <small style="font-size: 11px;">MAHASISWA</small>
     </div>
+
+    <!-- NAMA MAHASISWA YANG LOGIN SAMA SEPERTI DESAIN TOMBOL SISI KIRI -->
+    <div class="user-profile-badge">
+        {{ Auth::user()->mahasiswa->nama_mahasiswa ?? Auth::user()->name }}
+    </div>
+
+    <a href="{{ route('mahasiswa.dashboard') }}" class="nav-btn {{ request()->routeIs('mahasiswa.dashboard') ? 'active' : '' }}">Dashboard</a>
+    <a href="{{ route('mahasiswa.konsultasi.create') }}" class="nav-btn {{ request()->routeIs('mahasiswa.konsultasi.create') ? 'active' : '' }}">Tambah Log Bimbingan</a>
+    <a href="{{ route('mahasiswa.konsultasi.index') }}" class="nav-btn {{ request()->routeIs('mahasiswa.konsultasi.index') ? 'active' : '' }}">Riwayat Bimbingan</a>
+    <a href="{{ route('mahasiswa.kartu') }}" class="nav-btn {{ request()->routeIs('mahasiswa.kartu') ? 'active' : '' }}">Kartu Konsultasi</a>
+
+    <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button type="submit" class="nav-btn nav-btn-logout">LOG OUT</button>
+    </form>
+</div>
+
+<div class="main-content">
+    @yield('content')
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

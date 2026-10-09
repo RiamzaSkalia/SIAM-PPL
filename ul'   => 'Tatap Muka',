@@ -1,0 +1,13 @@
+[90m= [39m[34;4mApp\Models\Mahasiswa[39;24m {#7925
+    [34mid[39m: [35m1[39m,
+    [34muser_id[39m: [35m2[39m,
+    [34mperiode_id[39m: [35m1[39m,
+    [34mnim[39m: [32m"[39m[32m2410131220018[39m[32m"[39m,
+    [34mnama_mahasiswa[39m: [32m"[39m[32mRiska Amelia Zakiah[39m[32m"[39m,
+    [34mno_hp[39m: [32m"[39m[32m47165163985[39m[32m"[39m,
+    [34mprodi[39m: [36mnull[39m,
+    [34msemester[39m: [36mnull[39m,
+    [34mangkatan[39m: [36mnull[39m,
+    [34mcreated_at[39m: [32m"[39m[32m2026-10-09 05:27:01[39m[32m"[39m,
+    [34mupdated_at[39m: [32m"[39m[32m2026-10-09 05:27:01[39m[32m"[39m,
+  }
