@@ -3,11 +3,11 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h3 class="fw-bold m-0" style="color: #2b3990;">Selamat Datang, Admin PILKOM ULM! 👋</h3>
+        <h3 class="fw-bold m-0" style="color: #2b3990;">Selamat Datang, Admin PILKOM ULM!</h3>
         <p class="text-muted m-0">Ringkasan Program Asistensi Mengajar — Periode Aktif: <strong>{{ $activePeriode->nama_periode ?? 'Belum Ditentukan' }}</strong></p>
     </div>
     <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill shadow-sm">
-        🗓️ {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}
+        {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}
     </span>
 </div>
 
@@ -16,7 +16,7 @@
     <div class="col-md-3">
         <div class="p-3 bg-white rounded-4 shadow-sm border-start border-primary border-4 d-flex justify-content-between align-items-center">
             <div>
-                <small class="text-muted fw-bold d-block">🎓 TOTAL MAHASISWA AM</small>
+                <small class="text-muted fw-bold d-block">TOTAL MAHASISWA AM</small>
                 <h3 class="fw-bold m-0 mt-1 text-primary">{{ $totalMahasiswa }}</h3>
             </div>
             <i class="bi bi-people-fill fs-1 text-primary-subtle"></i>
@@ -25,7 +25,7 @@
     <div class="col-md-3">
         <div class="p-3 bg-white rounded-4 shadow-sm border-start border-success border-4 d-flex justify-content-between align-items-center">
             <div>
-                <small class="text-muted fw-bold d-block">👨‍🏫 DOSEN PEMBIMBING</small>
+                <small class="text-muted fw-bold d-block">DOSEN PEMBIMBING</small>
                 <h3 class="fw-bold m-0 mt-1 text-success">{{ $totalDosen }}</h3>
             </div>
             <i class="bi bi-person-badge-fill fs-1 text-success-subtle"></i>
@@ -34,7 +34,7 @@
     <div class="col-md-3">
         <div class="p-3 bg-white rounded-4 shadow-sm border-start border-warning border-4 d-flex justify-content-between align-items-center">
             <div>
-                <small class="text-muted fw-bold d-block">🏫 SEKOLAH MITRA</small>
+                <small class="text-muted fw-bold d-block">SEKOLAH MITRA</small>
                 <h3 class="fw-bold m-0 mt-1 text-warning">{{ $totalSekolah }}</h3>
             </div>
             <i class="bi bi-building-fill fs-1 text-warning-subtle"></i>
@@ -43,7 +43,7 @@
     <div class="col-md-3">
         <div class="p-3 bg-white rounded-4 shadow-sm border-start border-info border-4 d-flex justify-content-between align-items-center">
             <div>
-                <small class="text-muted fw-bold d-block">📄 TOTAL KONSULTASI</small>
+                <small class="text-muted fw-bold d-block">TOTAL KONSULTASI</small>
                 <h3 class="fw-bold m-0 mt-1 text-info">{{ $totalKonsultasi }}</h3>
             </div>
             <i class="bi bi-journal-check fs-1 text-info-subtle"></i>
@@ -53,25 +53,29 @@
 
 {{-- Row 2: Progress Kelayakan --}}
 <div class="p-4 bg-white rounded-4 shadow-sm mb-4">
-    <h6 class="fw-bold mb-3" style="color: #2b3990;">📊 PROGRESS KELAYAKAN CETAK KARTU KONSULTASI (MINIMAL 5 SESI VALIDASI)</h6>
+    <h6 class="fw-bold mb-3" style="color: #2b3990;">PROGRESS KELAYAKAN CETAK KARTU KONSULTASI (MINIMAL 5 SESI VALIDASI)</h6>
     
     <div class="mb-3">
         <div class="d-flex justify-content-between mb-1 fs-6">
-            <span>Mahasiswa Layak Cetak</span>
+            <span class="fw-semibold">Mahasiswa Layak Cetak</span>
             <span class="fw-bold text-success">{{ $persenLayak }}% ({{ $mahasiswaLayak }} / {{ $totalMahasiswa }} Mhs)</span>
         </div>
-        <div class="progress rounded-pill" style="height: 12px;">
-            <div class="progress-bar bg-success" role="progressbar" @style(['width' => $persenLayak . '%'])></div>
+        <div class="progress rounded-pill" style="height: 14px; background-color: #e9ecef;">
+            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" 
+            @style(['width: ' . $persenLayak . '%'])
+            aria-valuenow="{{ $persenLayak }}" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
     </div>
 
     <div>
         <div class="d-flex justify-content-between mb-1 fs-6">
-            <span>Mahasiswa Belum Layak</span>
+            <span class="fw-semibold">Mahasiswa Belum Layak</span>
             <span class="fw-bold text-danger">{{ $persenBelumLayak }}% ({{ $mahasiswaBelumLayak }} / {{ $totalMahasiswa }} Mhs)</span>
         </div>
-        <div class="progress rounded-pill" style="height: 12px;">
-            <div class="progress-bar bg-danger" role="progressbar" @style(['width' => $persenBelumLayak . '%'])></div>
+        <div class="progress rounded-pill" style="height: 14px; background-color: #e9ecef;">
+            <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar" 
+            @style(['width: ' . $persenBelumLayak . '%'])
+            aria-valuenow="{{ $persenBelumLayak }}" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
     </div>
 </div>
@@ -104,7 +108,7 @@
 
     <div class="col-md-6">
         <div class="p-4 bg-white rounded-4 shadow-sm h-100">
-            <h6 class="fw-bold mb-3" style="color: #2b3990;">🕒 AKTIVITAS KONSULTASI TERAKHIR</h6>
+            <h6 class="fw-bold mb-3" style="color: #2b3990;">AKTIVITAS KONSULTASI TERAKHIR</h6>
             <ul class="list-unstyled mb-4" style="font-size: 14px;">
                 @forelse($konsultasiTerakhir as $konsul)
                     <li class="mb-2 pb-2 border-bottom">
