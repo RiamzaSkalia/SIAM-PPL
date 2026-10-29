@@ -8,10 +8,13 @@ use App\Models\Dosen;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\PengaturanController;
+use App\Http\Controllers\Admin\RekognisiController as AdminRekognisiController;
 use App\Http\Controllers\Mahasiswa\DashboardController as MahasiswaDashboardController;
 use App\Http\Controllers\Mahasiswa\KonsultasiController;
+use App\Http\Controllers\Mahasiswa\RekognisiController as MahasiswaRekognisiController;
 use App\Http\Controllers\Dosen\DashboardController as DosenDashboardController;
 use App\Http\Controllers\Dosen\VerifikasiController;
+use App\Http\Controllers\Dosen\RekognisiController as DosenRekognisiController;
 use App\Http\Controllers\Pamong\RegisterController;
 
 Route::get('/', fn () => redirect()->route('login'));
@@ -29,10 +32,9 @@ Route::controller(RegisterController::class)->prefix('pamong')->name('pamong.')-
     Route::post('/register', 'register')->name('register.post');
 });
 
-
-
 Route::middleware(['auth'])->group(function () {
 
+    // ADMIN ROUTES
     Route::prefix('admin')->name('admin.')->group(function () {
 
         // Pengaturan Sistem
@@ -42,6 +44,13 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/periode-store', 'storePeriode')->name('periode.store');
             Route::post('/periode-hapus/{id}', 'destroyPeriode')->name('periode.destroy');
             Route::post('/update', 'updatePengaturan')->name('update');
+        });
+
+        // Rekognisi Mata Kuliah
+        Route::prefix('rekognisi')->name('rekognisi.')->controller(AdminRekognisiController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{id}', 'destroy')->name('destroy');
         });
 
         // Modul Admin Utama
@@ -92,9 +101,16 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/kartu-konsultasi', [MahasiswaDashboardController::class, 'halamanKartu'])->name('kartu');
         Route::get('/kartu-konsultasi/cetak', [MahasiswaDashboardController::class, 'cetakKartu'])->name('kartu.cetak');
 
+        // Route Konsultasi / Log Bimbingan
         Route::controller(KonsultasiController::class)->prefix('konsultasi')->name('konsultasi.')->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/tambah', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+        });
+
+        // Route Mata Kuliah Rekognisi
+        Route::controller(MahasiswaRekognisiController::class)->prefix('rekognisi')->name('rekognisi.')->group(function () {
+            Route::get('/', 'index')->name('index');
             Route::post('/', 'store')->name('store');
         });
     });
@@ -110,6 +126,9 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/mahasiswa-bimbingan', [DosenDashboardController::class, 'mahasiswaBimbingan'])->name('mahasiswa.bimbingan');
         Route::get('/mahasiswa-bimbingan/{id}', [DosenDashboardController::class, 'detailMahasiswa'])->name('mahasiswa.detail');
+
+        // Route Monitoring Rekognisi Matkul Mahasiswa
+        Route::get('/rekognisi', [DosenRekognisiController::class, 'index'])->name('rekognisi.index');
     });
 
 });
