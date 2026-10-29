@@ -37,6 +37,12 @@ Route::middleware(['auth'])->group(function () {
     // ADMIN ROUTES
     Route::prefix('admin')->name('admin.')->group(function () {
 
+        // Rekognisi Mata Kuliah
+        Route::prefix('rekognisi')->name('rekognisi.')->controller(AdminRekognisiController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('/', 'store')->name('store');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+        });
         // Pengaturan Sistem
         Route::prefix('pengaturan')->name('pengaturan.')->controller(PengaturanController::class)->group(function () {
             Route::get('/', 'index')->name('index');
@@ -50,6 +56,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('rekognisi')->name('rekognisi.')->controller(AdminRekognisiController::class)->group(function () {
             Route::get('/', 'index')->name('index');
             Route::post('/', 'store')->name('store');
+            Route::post('/jadwal', 'updateJadwal')->name('jadwal');
             Route::delete('/{id}', 'destroy')->name('destroy');
         });
 

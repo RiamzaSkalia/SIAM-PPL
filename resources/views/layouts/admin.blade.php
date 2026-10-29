@@ -47,6 +47,7 @@
     <a href="{{ route('admin.mahasiswa.index') }}" class="nav-btn {{ request()->routeIs('admin.mahasiswa.*') ? 'active' : '' }}">DATA MAHASISWA</a>
     <a href="{{ route('admin.sekolah.index') }}" class="nav-btn {{ request()->routeIs('admin.sekolah.*') ? 'active' : '' }}">DATA SEKOLAH</a>
     <a href="{{ route('admin.pemetaan.index') }}" class="nav-btn {{ request()->routeIs('admin.pemetaan.*') ? 'active' : '' }}">PEMETAAN BIMBINGAN</a>
+    <a href="{{ route('admin.rekognisi.index') }}" class="nav-btn {{ request()->routeIs('admin.rekognisi.*') ? 'active' : '' }}">MATKUL REKOGNISI</a>
     <a href="{{ route('admin.pengaturan.index') }}" class="nav-btn {{ request()->routeIs('admin.pengaturan.*') ? 'active' : '' }}">PENGATURAN SISTEM</a>
 
     <form action="{{ route('logout') }}" method="POST">
