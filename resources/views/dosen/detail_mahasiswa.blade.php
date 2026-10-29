@@ -74,21 +74,28 @@
                     </div>
 
                     <!-- Tombol Aksi Verifikasi Dosen -->
-                    @if($log->status_validasi == 'pending')
-                        <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-                            <form action="{{ route('dosen.konsultasi.setujui', $log->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm">
-                                    Setujui
-                                </button>
-                            </form>
-                            <form action="{{ route('dosen.konsultasi.tolak', $log->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm">
-                                    Tolak
-                                </button>
-                            </form>
-                        </div>
+                    <!-- Tombol Aksi Verifikasi Dosen -->
+                    @if($log->status_validasi == 'pending' || $log->status_validasi == 'menunggu verifikasi' || empty($log->status_validasi))
+                        <!-- Tombol Aksi Verifikasi Dosen -->
+                    <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+                        <form action="{{ route('dosen.konsultasi.setujui', $log->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" 
+                                    class="font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm {{ ($log->status_validasi == 'disetujui') ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white' }}"
+                                    {{ ($log->status_validasi == 'disetujui' || $log->status_validasi == 'ditolak') ? 'disabled' : '' }}>
+                                Setujui
+                            </button>
+                        </form>
+
+                        <form action="{{ route('dosen.konsultasi.tolak', $log->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" 
+                                    class="font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm {{ ($log->status_validasi == 'ditolak') ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-rose-600 hover:bg-rose-700 text-white' }}"
+                                    {{ ($log->status_validasi == 'disetujui' || $log->status_validasi == 'ditolak') ? 'disabled' : '' }}>
+                                Tolak
+                            </button>
+                        </form>
+                    </div>
                     @endif
                 </div>
             @empty

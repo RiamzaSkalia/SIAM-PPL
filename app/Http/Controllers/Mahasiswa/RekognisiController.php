@@ -17,6 +17,7 @@ class RekognisiController extends Controller
         $mahasiswa = Auth::user()->mahasiswa;
         $periodeAktif = PeriodeAkademik::where('status', 'aktif')->first();
 
+        // Ambil data mata kuliah rekognisi yang diinput admin pada periode aktif
         $availableMatkul = $periodeAktif 
             ? MatkulRekognisi::where('periode_id', $periodeAktif->id)->get() 
             : collect();
@@ -25,39 +26,29 @@ class RekognisiController extends Controller
             ? PengaturanRekognisi::where('periode_id', $periodeAktif->id)->first() 
             : null;
 
-        // Pengecekan Ketersediaan Pengajuan
-        $isClosedManual = $pengaturan ? !$pengaturan->is_open : false;
-        $isExpired = ($pengaturan && $pengaturan->tenggat_waktu) ? now()->greaterThan($pengaturan->tenggat_waktu) : false;
-        $isLocked = $isClosedManual || $isExpired;
-
-        $pengajuanSaya = $mahasiswa 
-            ? PengajuanRekognisi::where('mahasiswa_id', $mahasiswa->id)->pluck('matkul_rekognisi_id')->toArray() 
-            : [];
-
-        return view('mahasiswa.rekognisi.index', compact('availableMatkul', 'pengajuanSaya', 'pengaturan', 'isLocked', 'isExpired', 'isClosedManual'));
+        return view('mahasiswa.rekognisi.index', compact('availableMatkul', 'pengaturan'));
     }
 
     public function store(Request $request)
     {
         $mahasiswa = Auth::user()->mahasiswa;
-        $periodeAktif = PeriodeAkademik::where('status', 'aktif')->first();
-        $pengaturan = $periodeAktif ? PengaturanRekognisi::where('periode_id', $periodeAktif->id)->first() : null;
-
-        // Security Validation Server-Side
-        if ($pengaturan && (!$pengaturan->is_open || ($pengaturan->tenggat_waktu && now()->greaterThan($pengaturan->tenggat_waktu)))) {
-            return redirect()->back()->with('error', 'Gagal mengajukan! Jadwal pengajuan rekognisi telah ditutup oleh Admin.');
-        }
 
         $request->validate([
-            'matkul_ids' => 'required|array|min:1',
+            'matkul_rekognisi_id' => 'required|exists:matkul_rekognisi,id',
+            'bukti_pendukung'     => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
-        foreach ($request->matkul_ids as $matkulId) {
-            PengajuanRekognisi::firstOrCreate([
-                'mahasiswa_id'        => $mahasiswa->id,
-                'matkul_rekognisi_id' => $matkulId,
-            ]);
+        $path = null;
+        if ($request->hasFile('bukti_pendukung')) {
+            $path = $request->file('bukti_pendukung')->store('bukti_rekognisi', 'public');
         }
+
+        PengajuanRekognisi::create([
+            'mahasiswa_id'        => $mahasiswa->id,
+            'matkul_rekognisi_id' => $request->matkul_rekognisi_id,
+            'bukti_pendukung'     => $path,
+            'status'              => 'Pending',
+        ]);
 
         return redirect()->back()->with('success', 'Mata kuliah rekognisi berhasil diajukan!');
     }
