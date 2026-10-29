@@ -53,7 +53,8 @@
     <a href="{{ route('mahasiswa.konsultasi.index') }}" class="nav-btn {{ request()->routeIs('mahasiswa.konsultasi.index') ? 'active' : '' }}">Riwayat Bimbingan</a>
     <a href="{{ route('mahasiswa.kartu') }}" class="nav-btn {{ request()->routeIs('mahasiswa.kartu') ? 'active' : '' }}">Kartu Konsultasi</a>
     <!-- Tombol Menu Mata Kuliah Rekognisi -->
-    <a href="{{ route('mahasiswa.rekognisi.index') }}" class="btn w-100 mb-2 fw-bold text-dark text-center" style="background-color: #ffc107; border-radius: 50px; padding: 10px 15px; display: block; text-decoration: none;">Mata Kuliah Rekognisi</a>
+    <a href="{{ route('mahasiswa.rekognisi.index') }}" class="nav-btn {{ request()->routeIs('mahasiswa.rekognisi.index') ? 'active' : '' }}">Mata Kuliah Rekognisi</a>
+    <a href="{{ route('mahasiswa.dokumen.index') }}" class="nav-btn {{ request()->routeIs('mahasiswa.dokumen.index') ? 'active' : '' }}">Upload Dokumen</a>
 
     <form action="{{ route('logout') }}" method="POST">
         @csrf

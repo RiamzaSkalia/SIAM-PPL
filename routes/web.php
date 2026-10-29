@@ -120,6 +120,12 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::post('/', 'store')->name('store');
         });
+
+        // Route Upload Dokumen Mahasiswa
+        Route::controller(App\Http\Controllers\Mahasiswa\DokumenController::class)->prefix('dokumen')->name('dokumen.')->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('/', 'store')->name('store');
+        });
     });
 
     // DOSEN ROUTES
