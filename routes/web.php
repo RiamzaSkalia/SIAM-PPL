@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\RekognisiController as AdminRekognisiController;
 use App\Http\Controllers\Mahasiswa\DashboardController as MahasiswaDashboardController;
 use App\Http\Controllers\Mahasiswa\KonsultasiController;
 use App\Http\Controllers\Mahasiswa\RekognisiController as MahasiswaRekognisiController;
+use App\Http\Controllers\Mahasiswa\DokumenController;
 use App\Http\Controllers\Dosen\DashboardController as DosenDashboardController;
 use App\Http\Controllers\Dosen\VerifikasiController;
 use App\Http\Controllers\Dosen\RekognisiController as DosenRekognisiController;
@@ -37,12 +38,6 @@ Route::middleware(['auth'])->group(function () {
     // ADMIN ROUTES
     Route::prefix('admin')->name('admin.')->group(function () {
 
-        // Rekognisi Mata Kuliah
-        Route::prefix('rekognisi')->name('rekognisi.')->controller(AdminRekognisiController::class)->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::post('/', 'store')->name('store');
-            Route::delete('/{id}', 'destroy')->name('destroy');
-        });
         // Pengaturan Sistem
         Route::prefix('pengaturan')->name('pengaturan.')->controller(PengaturanController::class)->group(function () {
             Route::get('/', 'index')->name('index');
@@ -52,12 +47,13 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/update', 'updatePengaturan')->name('update');
         });
 
-        // Rekognisi Mata Kuliah
+        // ADMIN ROUTES - REKOGNISI (Disesuaikan agar tidak terduplikasi)
         Route::prefix('rekognisi')->name('rekognisi.')->controller(AdminRekognisiController::class)->group(function () {
             Route::get('/', 'index')->name('index');
             Route::post('/', 'store')->name('store');
             Route::post('/jadwal', 'updateJadwal')->name('jadwal');
             Route::delete('/{id}', 'destroy')->name('destroy');
+            Route::get('/export-pdf', 'exportPdf')->name('export.pdf');
         });
 
         // Modul Admin Utama
@@ -122,7 +118,7 @@ Route::middleware(['auth'])->group(function () {
         });
 
         // Route Upload Dokumen Mahasiswa
-        Route::controller(App\Http\Controllers\Mahasiswa\DokumenController::class)->prefix('dokumen')->name('dokumen.')->group(function () {
+        Route::controller(DokumenController::class)->prefix('dokumen')->name('dokumen.')->group(function () {
             Route::get('/', 'index')->name('index');
             Route::post('/', 'store')->name('store');
         });

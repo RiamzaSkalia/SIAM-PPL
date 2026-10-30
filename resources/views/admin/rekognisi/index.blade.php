@@ -3,7 +3,7 @@
 @section('content')
 <h3 class="fw-bold mb-3" style="color: #2b3990;">Kelola Mata Kuliah Rekognisi AM</h3>
 
-{{-- Notifikasi Melayang (Floating 5 Detik) --}}
+{{-- Notifikasi Melayang (Floating) --}}
 @if(session('success'))
     <div id="success-alert" class="alert alert-success fade show rounded-4 d-flex align-items-center justify-content-between px-4 py-3 shadow-lg" 
          role="alert" 
@@ -16,65 +16,88 @@
     </div>
 @endif
 
-@if(session('error') || $errors->any())
-    <div id="error-alert" class="alert alert-danger fade show rounded-4 d-flex align-items-center justify-content-between px-4 py-3 shadow-lg" 
-         role="alert" 
-         style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; min-width: 320px; max-width: 450px; background-color: #dc3545; color: white; border: none; transition: all 0.5s ease;">
-        <div class="d-flex align-items-center me-3">
-            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i> 
-            <span class="fw-semibold">{{ session('error') ?? $errors->first() }}</span>
+<div class="p-4 mb-4" style="background-color: #f7ede2; border-radius: 12px;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h6 class="fw-bold m-0" style="color: #2b3990;"><i class="bi bi-journal-bookmark-fill me-2"></i>Daftar Mata Kuliah Rekognisi</h6>
+            <small class="text-muted">Periode Aktif: <strong>({{ $periodeAktif->nama_periode ?? 'Belum Ditentukan' }})</strong></small>
         </div>
-        <button type="button" class="btn-close btn-close-white ms-auto" onclick="closeNotification()" aria-label="Close"></button>
-    </div>
-@endif
-
-<div class="p-3" style="background-color: #f7ede2; border-radius: 12px;">
-    {{-- Header Content & Action Bar --}}
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-        <h6 class="fw-bold m-0 d-flex align-items-center gap-2">
-            <i class="bi bi-journal-bookmark-fill"></i> 
-            <span>Daftar Mata Kuliah Rekognisi</span>
-            <small class="text-muted fw-normal ms-2">(Periode Aktif: <strong>{{ $periodeAktif->nama_periode ?? 'Belum Ditentukan' }}</strong>)</small>
-        </h6>
-
-        <div class="d-flex gap-2 align-items-center ms-auto">
-            <button type="button" class="btn btn-warning rounded-pill px-3 fw-bold text-nowrap text-dark" data-bs-toggle="modal" data-bs-target="#modalJadwal">
+        
+        {{-- Tombol Aksi Kanan (Export PDF Merah, Pengaturan, Tambah) --}}
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.rekognisi.export.pdf') }}" target="_blank" class="btn btn-danger rounded-pill px-3 fw-bold shadow-sm d-flex align-items-center">
+                📄 Export PDF
+            </a>
+            <button type="button" class="btn btn-warning rounded-pill px-3 fw-bold text-dark border-0 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalJadwal">
                 ⏱️ Pengaturan Tenggat Waktu
             </button>
-            <button type="button" class="btn-tambah text-nowrap" style="border: none;" data-bs-toggle="modal" data-bs-target="#modalTambah">
+            <button type="button" class="btn text-white rounded-pill px-4 fw-bold shadow-sm" style="background-color: #00c853;" data-bs-toggle="modal" data-bs-target="#modalTambah">
                 + Tambah Matkul Rekognisi
             </button>
         </div>
     </div>
 
-    {{-- Tabel Mata Kuliah Rekognisi --}}
-    <div class="table-responsive">
-        <table class="table table-custom align-middle text-start">
-            <thead>
-                <tr class="text-center">
-                    <th width="6%">NO</th>
-                    <th width="20%">KODE MK</th>
-                    <th width="48%">NAMA MATA KULIAH</th>
-                    <th width="14%">JUMLAH SKS</th>
-                    <th width="12%">AKSI</th>
+    {{-- Banner Status Tenggat --}}
+    @if($pengaturan)
+        <div class="alert {{ ($pengaturan->is_open && (!$pengaturan->tenggat_waktu || now()->lessThanOrEqualTo($pengaturan->tenggat_waktu))) ? 'alert-info' : 'alert-danger' }} rounded-3 mb-3 border-0 py-2 px-3 small d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Status Akses Mahasiswa:</strong> 
+                @if($pengaturan->is_open && (!$pengaturan->tenggat_waktu || now()->lessThanOrEqualTo($pengaturan->tenggat_waktu)))
+                    <span class="badge bg-success">DIBUKA 🟢</span>
+                @else
+                    <span class="badge bg-danger">DITUTUP 🔴</span>
+                @endif
+                <span class="ms-3">Batas Waktu: <strong>{{ $pengaturan->tenggat_waktu ? \Carbon\Carbon::parse($pengaturan->tenggat_waktu)->translatedFormat('d F Y - H:i') . ' WITA' : 'Tidak Ada Batas Waktu' }}</strong></span>
+            </div>
+        </div>
+    @endif
+
+    {{-- Tabel Data Matkul & Mahasiswa Pengaju --}}
+    <div class="table-responsive bg-white rounded-3 shadow-sm overflow-hidden">
+        <table class="table align-middle text-center m-0" style="font-size: 14px;">
+            <thead style="background-color: #536dfe; color: white;">
+                <tr>
+                    <th width="5%" class="py-3">NO</th>
+                    <th width="12%" class="py-3">KODE MK</th>
+                    <th width="25%" class="text-start py-3">NAMA MATA KULIAH</th>
+                    <th width="10%" class="py-3">JUMLAH SKS</th>
+                    <th width="35%" class="text-start py-3">MAHASISWA MENGAJUKAN</th>
+                    <th width="13%" class="py-3">AKSI</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($matkulList as $index => $item)
                 <tr>
-                    <td class="text-center fw-bold">{{ $index + 1 }}</td>
-                    <td class="fw-bold text-primary text-center">{{ $item->kode_mk }}</td>
-                    <td class="fw-semibold">{{ $item->nama_mk }}</td>
-                    <td class="text-center fw-bold">{{ $item->sks }} SKS</td>
-                    <td class="text-center">
-                        <button type="button" class="btn-action-hapus" onclick="openDeleteModal('{{ $item->id }}')">🗑️ Hapus</button>
+                    <td class="fw-bold">{{ $index + 1 }}</td>
+                    <td><span class="fw-bold text-primary">{{ $item->kode_mk }}</span></td>
+                    <td class="text-start ps-3 fw-semibold">{{ $item->nama_mk }}</td>
+                    <td>{{ $item->sks }} SKS</td>
+                    <td class="text-start ps-3">
+                        @if($item->pengajuan && $item->pengajuan->count() > 0)
+                            <div style="max-height: 90px; overflow-y: auto;">
+                                @foreach($item->pengajuan as $p)
+                                    @if($p->mahasiswa)
+                                        <div class="mb-1">
+                                            <span class="fw-semibold text-dark">• {{ $p->mahasiswa->nama_mahasiswa }}</span> 
+                                            <small class="text-muted">({{ $p->mahasiswa->nim }})</small>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                            <small class="text-success fw-bold">Total: {{ $item->pengajuan->count() }} Mahasiswa</small>
+                        @else
+                            <span class="badge bg-light text-muted border">Belum Ada Pengajuan</span>
+                        @endif
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold" onclick="openDeleteModal('{{ $item->id }}')">
+                            🗑️ Hapus
+                        </button>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="py-4 text-center text-muted">
-                        Belum ada mata kuliah rekognisi untuk periode ini. Klik <b>+ Tambah Matkul Rekognisi</b> di atas.
-                    </td>
+                    <td colspan="6" class="py-5 text-center text-muted">Belum ada mata kuliah rekognisi untuk periode ini. Klik <strong>+ Tambah Matkul Rekognisi</strong> di atas.</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -82,87 +105,75 @@
     </div>
 </div>
 
-{{-- Modal 1: Pengaturan Tenggat Waktu & Akses --}}
-<div class="modal fade" id="modalJadwal" tabindex="-1" aria-hidden="true">
+{{-- MODAL TAMBAH MATKUL --}}
+<div class="modal fade" id="modalTambah" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 p-4 border-0 shadow">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="fw-bold mb-0" style="color: #2b3990;">⏱️ Pengaturan Tenggat Waktu Rekognisi</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ route('admin.rekognisi.jadwal') }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small">Tenggat Waktu Pengajuan (Sistem Otomatis Kunci)</label>
-                        <input type="datetime-local" name="tenggat_waktu" class="form-control rounded-3" 
-                               value="{{ $pengaturan && $pengaturan->tenggat_waktu ? \Carbon\Carbon::parse($pengaturan->tenggat_waktu)->format('Y-m-d\TH:i') : '' }}">
-                        <small class="text-muted d-block mt-1">Kosongkan jika tidak ada batas waktu otomatis.</small>
-                    </div>
-
-                    <div class="form-check form-switch p-3 bg-light rounded-3 d-flex align-items-center justify-content-between me-0">
-                        <label class="form-check-label fw-bold small mb-0 ms-2" for="isOpenSwitch">Buka Akses Pengajuan untuk Mahasiswa</label>
-                        <input class="form-check-input ms-0 fs-5" type="checkbox" name="is_open" id="isOpenSwitch" value="1" {{ ($pengaturan && $pengaturan->is_open) ? 'checked' : '' }}>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4" style="background-color: #2b3990; border: none;">Simpan Pengaturan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-{{-- Modal 2: Tambah Matkul Rekognisi --}}
-<div class="modal fade" id="modalTambah" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 p-4 border-0 shadow">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="fw-bold mb-0" style="color: #2b3990;">➕ Tambah Mata Kuliah Rekognisi</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
+            <h5 class="fw-bold mb-3" style="color: #2b3990;">➕ Tambah Mata Kuliah Rekognisi</h5>
             <form action="{{ route('admin.rekognisi.store') }}" method="POST">
                 @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small">Kode Mata Kuliah</label>
-                        <input type="text" name="kode_mk" class="form-control rounded-3" placeholder="Contoh: PIL301" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small">Nama Mata Kuliah</label>
-                        <input type="text" name="nama_mk" class="form-control rounded-3" placeholder="Contoh: Asistensi Mengajar" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small">Jumlah SKS</label>
-                        <input type="number" name="sks" class="form-control rounded-3" min="1" max="20" placeholder="Contoh: 4" required>
-                    </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Kode Mata Kuliah <span class="text-danger">*</span></label>
+                    <input type="text" name="kode_mk" class="form-control rounded-3" placeholder="Contoh: PIL301" required>
                 </div>
-                <div class="modal-footer border-0 pt-0 d-flex justify-content-end gap-2">
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Nama Mata Kuliah <span class="text-danger">*</span></label>
+                    <input type="text" name="nama_mk" class="form-control rounded-3" placeholder="Contoh: Pembelajaran Digital" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Jumlah SKS <span class="text-danger">*</span></label>
+                    <input type="number" name="sks" class="form-control rounded-3" min="1" max="6" value="3" required>
+                </div>
+                <div class="d-flex justify-content-end gap-2 mt-4">
                     <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn-tambah rounded-pill px-4" style="border: none;">Simpan</button>
+                    <button type="submit" class="btn text-white rounded-pill px-4 fw-bold" style="background-color: #3b31b2;">Simpan Data</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-{{-- Modal 3: Hapus Data --}}
+{{-- MODAL PENGATURAN TENGGAT --}}
+<div class="modal fade" id="modalJadwal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 p-4 border-0 shadow">
+            <h5 class="fw-bold mb-3" style="color: #2b3990;">⏱️ Pengaturan Tenggat Waktu Rekognisi</h5>
+            <form action="{{ route('admin.rekognisi.jadwal') }}" method="POST">
+                @csrf
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Tenggat Waktu Pengajuan</label>
+                    <input type="datetime-local" name="tenggat_waktu" class="form-control rounded-3" 
+                           value="{{ $pengaturan && $pengaturan->tenggat_waktu ? \Carbon\Carbon::parse($pengaturan->tenggat_waktu)->format('Y-m-d\TH:i') : '' }}">
+                </div>
+
+                <div class="form-check form-switch mb-4 p-3 bg-light rounded-3">
+                    <input class="form-check-input ms-0 me-2" type="checkbox" name="is_open" id="isOpenSwitch" {{ ($pengaturan && $pengaturan->is_open) ? 'checked' : '' }}>
+                    <label class="form-check-input-label fw-bold small" for="isOpenSwitch">Buka Akses Pengajuan untuk Mahasiswa</label>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">💾 Simpan Pengaturan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Hapus --}}
 @foreach($matkulList as $item)
-<div class="modal fade" id="deleteModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="deleteModal{{ $item->id }}" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 p-4 text-center border-0 shadow">
-            <div class="modal-body p-0">
-                <h5 class="fw-bold mb-3" style="color: #2b3990;">Konfirmasi Hapus</h5>
-                <p class="text-muted mb-4">Apakah Anda yakin ingin menghapus mata kuliah <strong>{{ $item->nama_mk }} ({{ $item->kode_mk }})</strong> dari daftar rekognisi?</p>
-                <div class="d-flex justify-content-center gap-2">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                    <form action="{{ route('admin.rekognisi.destroy', $item->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger rounded-pill px-4">Hapus</button>
-                    </form>
-                </div>
+            <h5 class="fw-bold mb-3" style="color: #2b3990;">Konfirmasi Hapus</h5>
+            <p class="text-muted mb-4">Hapus mata kuliah <strong>{{ $item->nama_mk }}</strong>?</p>
+            <div class="d-flex justify-content-center gap-2">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                <form action="{{ route('admin.rekognisi.destroy', $item->id) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger rounded-pill px-4">Hapus</button>
+                </form>
             </div>
         </div>
     </div>
@@ -171,26 +182,19 @@
 
 <script>
     function closeNotification() {
-        const alertSuccess = document.getElementById('success-alert');
-        const alertError = document.getElementById('error-alert');
-        [alertSuccess, alertError].forEach(alertElement => {
-            if (alertElement) {
-                alertElement.style.opacity = '0';
-                alertElement.style.transform = 'translate(-50%, -20px)';
-                setTimeout(() => { alertElement.style.display = 'none'; }, 500);
-            }
-        });
+        const alertElement = document.getElementById('success-alert');
+        if (alertElement) {
+            alertElement.style.opacity = '0';
+            setTimeout(() => { alertElement.style.display = 'none'; }, 500);
+        }
     }
-
     document.addEventListener("DOMContentLoaded", function () {
-        setTimeout(function() { closeNotification(); }, 5000);
+        setTimeout(closeNotification, 5000);
     });
-
     function openDeleteModal(id) {
         const modalElement = document.getElementById('deleteModal' + id);
-        if (modalElement && typeof bootstrap !== 'undefined') {
-            const myModal = new bootstrap.Modal(modalElement);
-            myModal.show();
+        if (modalElement) {
+            new bootstrap.Modal(modalElement).show();
         }
     }
 </script>
