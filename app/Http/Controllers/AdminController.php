@@ -25,6 +25,20 @@ class AdminController extends Controller
         return PeriodeAkademik::where('status', 'aktif')->first();
     }
 
+    /**
+     * Helper Cek Keunikan Password terhadap Seluruh User
+     */
+    private function isPasswordUsedByOtherUser($plainPassword)
+    {
+        $users = User::all();
+        foreach ($users as $user) {
+            if (Hash::check($plainPassword, $user->password)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // ==========================================
     // 0. DASHBOARD ADMIN (REALTIME PERIODE AKTIF)
     // ==========================================
@@ -91,15 +105,11 @@ class AdminController extends Controller
     // ==========================================
     // 1. MODUL DOSEN
     // ==========================================
-    // ==========================================
-    // 1. MODUL DOSEN
-    // ==========================================
     public function indexDosen(Request $request)
     {
         $activePeriode = $this->getActivePeriode();
         $search = $request->query('search');
 
-        // Tampilkan dosen di periode aktif ATAU dosen yang belum punya periode_id
         $dosen = Dosen::when($activePeriode, function ($query) use ($activePeriode) {
                 return $query->where(function($q) use ($activePeriode) {
                     $q->where('periode_id', $activePeriode->id)
@@ -115,6 +125,11 @@ class AdminController extends Controller
         return view('admin.dosen_index', compact('dosen'));
     }
 
+    public function createDosen()
+    {
+        return view('admin.dosen_create');
+    }
+
     public function storeDosen(Request $request)
     {
         $activePeriode = $this->getActivePeriode();
@@ -126,6 +141,12 @@ class AdminController extends Controller
             'password'   => 'required|string|min:4',
         ]);
 
+        if ($this->isPasswordUsedByOtherUser($request->password)) {
+            return redirect()->back()->withInput()->withErrors([
+                'password' => 'Password ini sudah pernah digunakan! Klik Shuffle Password untuk membuat yang baru.'
+            ]);
+        }
+
         DB::transaction(function () use ($request, $activePeriode) {
             $user = User::create([
                 'name'     => $request->nama_dosen,
@@ -136,22 +157,17 @@ class AdminController extends Controller
             ]);
 
             Dosen::create([
-                'user_id'    => $user->id,
-                'periode_id' => $activePeriode ? $activePeriode->id : null,
-                'nip'        => $request->nip,
-                'nama_dosen' => $request->nama_dosen,
-                'email'      => $request->email,
+                'user_id'        => $user->id,
+                'periode_id'     => $activePeriode ? $activePeriode->id : null,
+                'nip'            => $request->nip,
+                'nama_dosen'     => $request->nama_dosen,
+                'email'          => $request->email,
+                'plain_password' => $request->password, // SIMPAN PASSWORD PLAIN
             ]);
         });
 
-        return redirect()->route('admin.dosen.index')->with('success', 'Data Dosen berhasil disimpan!');
+        return redirect()->route('admin.dosen.index')->with('success', 'Data Dosen & Akun berhasil disimpan!');
     }
-
-    public function createDosen()
-    {
-        return view('admin.dosen_create');
-    }
-
 
     public function editDosen($id)
     {
@@ -169,12 +185,24 @@ class AdminController extends Controller
             'password'   => 'nullable|string|min:4',
         ]);
 
+        if ($request->filled('password') && $this->isPasswordUsedByOtherUser($request->password)) {
+            return redirect()->back()->withInput()->withErrors([
+                'password' => 'Password ini sudah pernah digunakan! Klik Shuffle Password untuk membuat yang baru.'
+            ]);
+        }
+
         DB::transaction(function () use ($request, $dosen) {
-            $dosen->update([
+            $updateData = [
                 'nip'        => $request->nip,
                 'nama_dosen' => $request->nama_dosen,
                 'email'      => $request->email,
-            ]);
+            ];
+
+            if ($request->filled('password')) {
+                $updateData['plain_password'] = $request->password;
+            }
+
+            $dosen->update($updateData);
 
             if ($dosen->user) {
                 $userData = [
@@ -195,13 +223,30 @@ class AdminController extends Controller
     public function destroyDosen($id)
     {
         $dosen = Dosen::findOrFail($id);
-        if ($dosen->user) {
-            $dosen->user->delete();
-        } else {
-            $dosen->delete();
-        }
+
+        DB::transaction(function () use ($dosen) {
+            if ($dosen->user) {
+                $dosen->user->delete();
+            }
+            $dosen->delete(); 
+        });
 
         return redirect()->route('admin.dosen.index')->with('success', 'Data Dosen berhasil dihapus!');
+    }
+
+    public function exportAkunDosenPdf()
+    {
+        $activePeriode = $this->getActivePeriode();
+        $periodeId = $activePeriode ? $activePeriode->id : null;
+
+        $dosenList = Dosen::where(function($q) use ($periodeId) {
+            $q->where('periode_id', $periodeId)->orWhereNull('periode_id');
+        })->orderBy('nama_dosen', 'asc')->get();
+
+        $pdf = Pdf::loadView('admin.dosen_pdf_akun', compact('dosenList', 'activePeriode'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Rekap_Akun_Dosen_Pembimbing.pdf');
     }
 
     // ==========================================
@@ -233,7 +278,7 @@ class AdminController extends Controller
 
         if (!$activePeriode) {
             return redirect()->route('admin.pengaturan.index')
-                ->with('error', 'Silakan buat/aktifkan periode akademik terlebih dahulu sebelum menambah data!');
+                ->with('error', 'Silakan buat/aktifkan periode akademik terlebih dahulu!');
         }
 
         $request->validate([
@@ -242,6 +287,12 @@ class AdminController extends Controller
             'password'       => 'required|string|min:4',
             'no_hp'          => 'nullable|string|max:20',
         ]);
+
+        if ($this->isPasswordUsedByOtherUser($request->password)) {
+            return redirect()->back()->withInput()->withErrors([
+                'password' => 'Password ini sudah pernah digunakan! Klik Shuffle Password untuk membuat yang baru.'
+            ]);
+        }
 
         DB::transaction(function () use ($request, $activePeriode) {
             $user = User::create([
@@ -257,6 +308,7 @@ class AdminController extends Controller
                 'nim'            => $request->nim,
                 'nama_mahasiswa' => $request->nama_mahasiswa,
                 'no_hp'          => $request->no_hp,
+                'plain_password' => $request->password, // SIMPAN PASSWORD PLAIN
             ]);
         });
 
@@ -279,12 +331,24 @@ class AdminController extends Controller
             'password'       => 'nullable|string|min:4',
         ]);
 
+        if ($request->filled('password') && $this->isPasswordUsedByOtherUser($request->password)) {
+            return redirect()->back()->withInput()->withErrors([
+                'password' => 'Password ini sudah pernah digunakan! Klik Shuffle Password untuk membuat yang baru.'
+            ]);
+        }
+
         DB::transaction(function () use ($request, $mahasiswa) {
-            $mahasiswa->update([
+            $updateData = [
                 'nim'            => $request->nim,
                 'nama_mahasiswa' => $request->nama_mahasiswa,
                 'no_hp'          => $request->no_hp,
-            ]);
+            ];
+
+            if ($request->filled('password')) {
+                $updateData['plain_password'] = $request->password;
+            }
+
+            $mahasiswa->update($updateData);
 
             if ($mahasiswa->user) {
                 $userData = [
@@ -304,13 +368,29 @@ class AdminController extends Controller
     public function destroyMahasiswa($id)
     {
         $mahasiswa = Mahasiswa::findOrFail($id);
-        if ($mahasiswa->user) {
-            $mahasiswa->user->delete();
-        } else {
+
+        DB::transaction(function () use ($mahasiswa) {
+            if ($mahasiswa->user) {
+                $mahasiswa->user->delete();
+            }
             $mahasiswa->delete();
-        }
+        });
 
         return redirect()->route('admin.mahasiswa.index')->with('success', 'Data Mahasiswa berhasil dihapus!');
+    }
+
+    public function exportAkunMahasiswaPdf()
+    {
+        $activePeriode = $this->getActivePeriode();
+
+        $mahasiswaList = Mahasiswa::where('periode_id', $activePeriode->id ?? null)
+            ->orderBy('nama_mahasiswa', 'asc')
+            ->get();
+
+        $pdf = Pdf::loadView('admin.mahasiswa_pdf_akun', compact('mahasiswaList', 'activePeriode'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Rekap_Akun_Mahasiswa_AM.pdf');
     }
 
     // ==========================================
@@ -433,25 +513,33 @@ class AdminController extends Controller
     }
 
     public function createPemetaan()
-    {
-        $activePeriode = $this->getActivePeriode();
-        $periodeList = PeriodeAkademik::all();
+{
+    $activePeriode = $this->getActivePeriode();
+    $periodeList = PeriodeAkademik::all();
 
-        // Tampilkan data yang sesuai periode aktif ATAU yang periode_id nya NULL/kosong
-        $sekolahList = SekolahMitra::when($activePeriode, function ($q) use ($activePeriode) {
-            return $q->where('periode_id', $activePeriode->id)->orWhereNull('periode_id');
-        })->with('guruPamong')->get();
+    $sekolahList = SekolahMitra::when($activePeriode, function ($q) use ($activePeriode) {
+        return $q->where('periode_id', $activePeriode->id)->orWhereNull('periode_id');
+    })->with('guruPamong')->get();
 
-        $dosenList = Dosen::when($activePeriode, function ($q) use ($activePeriode) {
-            return $q->where('periode_id', $activePeriode->id)->orWhereNull('periode_id');
-        })->get();
+    $dosenList = Dosen::when($activePeriode, function ($q) use ($activePeriode) {
+        return $q->where('periode_id', $activePeriode->id)->orWhereNull('periode_id');
+    })->get();
 
-        $mahasiswaList = Mahasiswa::when($activePeriode, function ($q) use ($activePeriode) {
-            return $q->where('periode_id', $activePeriode->id)->orWhereNull('periode_id');
-        })->get();
+    // HANYA ambil mahasiswa yang BELUM memiliki plotting bimbingan pada periode aktif
+    $mahasiswaList = Mahasiswa::when($activePeriode, function ($q) use ($activePeriode) {
+            return $q->where(function ($sub) use ($activePeriode) {
+                $sub->where('periode_id', $activePeriode->id)->orWhereNull('periode_id');
+            });
+        })
+        ->whereDoesntHave('plottingBimbingan', function ($q) use ($activePeriode) {
+            if ($activePeriode) {
+                $q->where('periode_id', $activePeriode->id);
+            }
+        })
+        ->get();
 
-        return view('admin.pemetaan_create', compact('periodeList', 'sekolahList', 'dosenList', 'mahasiswaList'));
-    }
+    return view('admin.pemetaan_create', compact('periodeList', 'sekolahList', 'dosenList', 'mahasiswaList'));
+}
 
     public function editPemetaan($id)
     {
@@ -467,9 +555,23 @@ class AdminController extends Controller
             return $q->where('periode_id', $activePeriode->id)->orWhereNull('periode_id');
         })->get();
 
+        // Ambil mahasiswa yang BELUM diplotting ATAU yang sedang terdaftar di plotting ini ($plotting->id)
         $mahasiswaList = Mahasiswa::when($activePeriode, function ($q) use ($activePeriode) {
-            return $q->where('periode_id', $activePeriode->id)->orWhereNull('periode_id');
-        })->get();
+                return $q->where(function ($sub) use ($activePeriode) {
+                    $sub->where('periode_id', $activePeriode->id)->orWhereNull('periode_id');
+                });
+            })
+            ->where(function ($query) use ($activePeriode, $plotting) {
+                $query->whereDoesntHave('plottingBimbingan', function ($q) use ($activePeriode) {
+                    if ($activePeriode) {
+                        $q->where('periode_id', $activePeriode->id);
+                    }
+                })
+                ->orWhereHas('plottingBimbingan', function ($q) use ($plotting) {
+                    $q->where('plotting_bimbingan.id', $plotting->id);
+                });
+            })
+            ->get();
 
         return view('admin.pemetaan_create', compact('plotting', 'periodeList', 'sekolahList', 'dosenList', 'mahasiswaList'));
     }
@@ -477,10 +579,10 @@ class AdminController extends Controller
     public function storePemetaan(Request $request)
     {
         $request->validate([
-            'periode_id'   => 'required',
-            'sekolah_id'   => 'required',
-            'dosen_id'     => 'required',
-            'mahasiswa_ids'=> 'required|array|min:1',
+            'periode_id'    => 'required',
+            'sekolah_id'    => 'required',
+            'dosen_id'      => 'required',
+            'mahasiswa_ids' => 'required|array|min:1',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -496,15 +598,14 @@ class AdminController extends Controller
         return redirect()->route('admin.pemetaan.index')->with('success', 'Pemetaan Bimbingan berhasil disimpan!');
     }
 
-
     public function updatePemetaan(Request $request, $id)
     {
         $plotting = PlottingBimbingan::findOrFail($id);
         $request->validate([
-            'periode_id'   => 'required',
-            'sekolah_id'   => 'required',
-            'dosen_id'     => 'required',
-            'mahasiswa_ids'=> 'required|array|min:1',
+            'periode_id'    => 'required',
+            'sekolah_id'    => 'required',
+            'dosen_id'      => 'required',
+            'mahasiswa_ids' => 'required|array|min:1',
         ]);
 
         DB::transaction(function () use ($request, $plotting) {

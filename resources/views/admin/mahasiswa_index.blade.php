@@ -3,11 +3,11 @@
 @section('content')
 <h3 class="fw-bold mb-3" style="color: #2b3990;">Data Mahasiswa</h3>
 
-{{-- Notifikasi Melayang (Floating - Tidak Mendorong Layout) --}}
+{{-- Notifikasi Melayang Responsif (Success & Error) --}}
 @if(session('success'))
     <div id="success-alert" class="alert alert-success fade show rounded-4 d-flex align-items-center justify-content-between px-4 py-3 shadow-lg" 
          role="alert" 
-         style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; min-width: 320px; max-width: 450px; background-color: #28a745; color: white; border: none; transition: all 0.5s ease;">
+         style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 92%; max-width: 450px; background-color: #28a745; color: white; border: none; transition: all 0.5s ease;">
         <div class="d-flex align-items-center me-3">
             <i class="bi bi-check-circle-fill me-2 fs-5"></i> 
             <span class="fw-semibold">{{ session('success') }}</span>
@@ -16,27 +16,55 @@
     </div>
 @endif
 
+@if(session('error'))
+    <div id="error-alert" class="alert alert-danger fade show rounded-4 d-flex align-items-center justify-content-between px-4 py-3 shadow-lg" 
+         role="alert" 
+         style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 92%; max-width: 450px; background-color: #dc3545; color: white; border: none; transition: all 0.5s ease;">
+        <div class="d-flex align-items-center me-3">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i> 
+            <span class="fw-semibold">{{ session('error') }}</span>
+        </div>
+        <button type="button" class="btn-close btn-close-white ms-auto" onclick="closeNotification()" aria-label="Close"></button>
+    </div>
+@endif
+
 <div class="p-3" style="background-color: #f7ede2; border-radius: 12px;">
     <h6 class="fw-bold mb-3"><i class="bi bi-people-fill"></i> Kelola Data Mahasiswa AM</h6>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <form action="{{ route('admin.mahasiswa.index') }}" method="GET">
-            <input type="text" name="search" class="search-input" placeholder="🔍 Cari NIM / Nama Mahasiswa.." value="{{ request('search') }}">
-        </form>
-        <a href="{{ route('admin.mahasiswa.create') }}" class="btn-tambah">+ Tambah Mahasiswa</a>
+    {{-- Filter & Action Bar Responsif --}}
+    <div class="row g-2 align-items-center mb-3">
+        <div class="col-12 col-md-5 col-lg-4">
+            <form action="{{ route('admin.mahasiswa.index') }}" method="GET">
+                <input type="text" name="search" class="search-input w-100" placeholder="🔍 Cari NIM / Nama Mahasiswa.." value="{{ request('search') }}">
+            </form>
+        </div>
+
+        <div class="col-12 col-md-7 col-lg-8 d-flex flex-wrap align-items-stretch justify-content-md-end gap-2">
+            <a href="{{ route('admin.mahasiswa.export_pdf') }}" target="_blank" 
+               class="btn btn-danger rounded-pill px-3 py-2 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center text-nowrap flex-fill flex-sm-grow-0"
+               style="line-height: 1.2;">
+                📄 Rekap Akun PDF
+            </a>
+            <a href="{{ route('admin.mahasiswa.create') }}" 
+               class="btn-tambah px-3 py-2 d-inline-flex align-items-center justify-content-center text-nowrap flex-fill flex-sm-grow-0"
+               style="line-height: 1.2;">
+                + Tambah Mahasiswa
+            </a>
+        </div>
     </div>
 
+    {{-- Tabel Responsif (Scroll Horizontal Mulus di HP) --}}
     <div class="table-responsive">
-        <table class="table table-custom align-middle text-center">
+        <table class="table table-custom align-middle text-center" style="min-width: 880px;">
             <thead>
-                <tr>
+                <tr class="text-nowrap">
                     <th width="5%">No</th>
-                    <th width="15%">NIM</th>
+                    <th width="14%">NIM</th>
                     <th width="20%">Nama Mahasiswa</th>
                     <th width="20%">Sekolah Mitra</th>
-                    <th width="15%">Dosen Pembimbing</th>
+                    <th width="16%">Dosen Pembimbing</th>
                     <th width="10%">Progres</th>
-                    <th width="20%">Aksi</th>
+                    <th width="15%">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,7 +75,7 @@
                 @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->nim }}</td>
+                    <td class="text-nowrap">{{ $item->nim }}</td>
                     <td class="text-start ps-3 fw-semibold">{{ $item->nama_mahasiswa }}</td>
                     <td>
                         @if($plot && $plot->sekolah)
@@ -64,7 +92,7 @@
                             <span class="badge bg-secondary">Belum Ada DPL</span>
                         @endif
                     </td>
-                    <td>
+                    <td class="text-nowrap">
                         @if($plot)
                             <span class="badge bg-success rounded-pill px-3 py-2">Aktif AM</span>
                         @else
@@ -72,8 +100,10 @@
                         @endif
                     </td>
                     <td>
-                        <a href="{{ route('admin.mahasiswa.edit', $item->id) }}" class="btn-action-edit me-1">✏️ Edit</a>
-                        <button type="button" class="btn-action-hapus" onclick="openDeleteModal('{{ $item->id }}')">🗑️ Hapus</button>
+                        <div class="d-flex justify-content-center gap-1 text-nowrap">
+                            <a href="{{ route('admin.mahasiswa.edit', $item->id) }}" class="btn-action-edit">✏️ Edit</a>
+                            <button type="button" class="btn-action-hapus" onclick="openDeleteModal('{{ $item->id }}')">🗑️ Hapus</button>
+                        </div>
                     </td>
                 </tr>
                 @empty
@@ -109,14 +139,17 @@
 @endforeach
 
 <script>
-    // 1. Fungsi Tutup Notifikasi
+    // 1. Fungsi Tutup Notifikasi (Success & Error)
     function closeNotification() {
-        const alertElement = document.getElementById('success-alert');
-        if (alertElement) {
-            alertElement.style.opacity = '0';
-            alertElement.style.transform = 'translate(-50%, -20px)';
-            setTimeout(() => { alertElement.style.display = 'none'; }, 500);
-        }
+        const alertSuccess = document.getElementById('success-alert');
+        const alertError = document.getElementById('error-alert');
+        [alertSuccess, alertError].forEach(alertElement => {
+            if (alertElement) {
+                alertElement.style.opacity = '0';
+                alertElement.style.transform = 'translate(-50%, -20px)';
+                setTimeout(() => { alertElement.style.display = 'none'; }, 500);
+            }
+        });
     }
 
     // Auto dismiss dalam 5 detik

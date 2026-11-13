@@ -37,6 +37,10 @@ Route::middleware(['auth'])->group(function () {
 
     // ADMIN ROUTES
     Route::prefix('admin')->name('admin.')->group(function () {
+        
+        // Export PDF Rekap Akun Dosen & Mahasiswa
+        Route::get('/dosen/export-akun-pdf', [AdminController::class, 'exportAkunDosenPdf'])->name('dosen.export_pdf');
+        Route::get('/mahasiswa/export-akun-pdf', [AdminController::class, 'exportAkunMahasiswaPdf'])->name('mahasiswa.export_pdf');
 
         // Pengaturan Sistem
         Route::prefix('pengaturan')->name('pengaturan.')->controller(PengaturanController::class)->group(function () {
@@ -121,6 +125,7 @@ Route::middleware(['auth'])->group(function () {
         Route::controller(DokumenController::class)->prefix('dokumen')->name('dokumen.')->group(function () {
             Route::get('/', 'index')->name('index');
             Route::post('/', 'store')->name('store');
+
         });
     });
 

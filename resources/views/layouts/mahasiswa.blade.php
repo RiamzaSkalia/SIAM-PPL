@@ -58,7 +58,9 @@
 
     <form action="{{ route('logout') }}" method="POST">
         @csrf
-        <button type="submit" class="nav-btn nav-btn-logout">LOG OUT</button>
+        <button type="button" class="nav-btn nav-btn-logout" data-bs-toggle="modal" data-bs-target="#logoutModal">
+            LOG OUT
+        </button>
     </form>
 </div>
 
@@ -67,5 +69,32 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- MODAL KONFIRMASI LOG OUT -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 p-4 text-center border-0 shadow-lg">
+            <div class="modal-body p-0">
+                <div class="mb-3">
+                    <i class="bi bi-box-arrow-right text-warning" style="font-size: 3.5rem;"></i>
+                </div>
+                <h5 class="fw-bold mb-2" id="logoutModalLabel" style="color: #2b3990;">Konfirmasi Keluar</h5>
+                <p class="text-muted mb-4">Apakah Anda yakin ingin keluar dari halaman ini?</p>
+                
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4 fw-semibold" data-bs-dismiss="modal">
+                        Batal
+                    </button>
+                    
+                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-danger rounded-pill px-4 fw-semibold">
+                            Ya, Keluar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

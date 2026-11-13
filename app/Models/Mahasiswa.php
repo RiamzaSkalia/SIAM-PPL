@@ -18,6 +18,7 @@ class Mahasiswa extends Model
         'nim',
         'nama_mahasiswa',
         'no_hp',
+        'plain_password',
     ];
 
     // Relasi Banyak ke Banyak melalui pivot plotting_mahasiswa

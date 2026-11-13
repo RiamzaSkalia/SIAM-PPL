@@ -2,15 +2,30 @@
 
 @section('content')
 <h3 class="fw-bold mb-4" style="color: #2b3990;">
-    {{ isset($mahasiswa) ? 'Edit Data Mahasiswa' : 'Data Mahasiswa' }}
+    {{ isset($mahasiswa) ? 'Edit Data Mahasiswa' : 'Tambah Data Mahasiswa' }}
 </h3>
 
-<div class="form-card p-4" style="background-color: #f7ede2; border-radius: 12px;">
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+{{-- Notifikasi Error Melayang Responsif --}}
+@if(session('error') || $errors->any())
+    <div id="error-alert" class="alert alert-danger fade show rounded-4 d-flex align-items-center justify-content-between px-4 py-3 shadow-lg" 
+         role="alert" 
+         style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 92%; max-width: 500px; background-color: #dc3545; color: white; border: none; transition: all 0.5s ease;">
+        <div class="d-flex align-items-center me-3">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i> 
+            <span class="fw-semibold">
+                {{ session('error') ?? $errors->first() }}
+            </span>
+        </div>
+        <button type="button" class="btn-close btn-close-white ms-auto" onclick="closeErrorNotification()" aria-label="Close"></button>
+    </div>
+@endif
+
+<div class="form-card p-3 p-sm-4" style="background-color: #f7ede2; border-radius: 12px;">
+    <div class="d-flex justify-content-between align-items-start gap-2 mb-4 pb-2 border-bottom">
         <h5 class="fw-bold m-0" style="color: #2b3990;">
             ➕ {{ isset($mahasiswa) ? 'Edit Data Mahasiswa AM' : 'Tambah Data Mahasiswa AM' }}
         </h5>
-        <a href="{{ route('admin.mahasiswa.index') }}" class="text-decoration-none text-dark fs-5 fw-bold">&times;</a>
+        <a href="{{ route('admin.mahasiswa.index') }}" class="text-decoration-none text-dark fs-4 fw-bold lh-1">&times;</a>
     </div>
 
     <form action="{{ isset($mahasiswa) ? route('admin.mahasiswa.update', $mahasiswa->id) : route('admin.mahasiswa.store') }}" method="POST">
@@ -34,16 +49,9 @@
                 <input type="text" name="nama_mahasiswa" class="form-control rounded-3 p-2" placeholder="Masukkan Nama Lengkap" value="{{ old('nama_mahasiswa', $mahasiswa->nama_mahasiswa ?? '') }}" required>
             </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6 mb-3 mb-md-0">
-                    <label class="fw-bold mb-1 fs-6">Nomor HP / WhatsApp</label>
-                    <input type="text" name="no_hp" class="form-control form-control-custom mb-3" placeholder="Contoh: 081234567890" value="{{ old('no_hp', $mahasiswa->no_hp ?? '') }}">
-                </div>
-                <div class="col-md-6">
-                    <label class="fw-bold mb-1 fs-6">Periode Akademik</label>
-                    <input type="text" class="form-control rounded-3 p-2 bg-light" value="{{ $activePeriode->nama_periode ?? 'Periode Aktif' }}" readonly>
-                    <small class="text-muted">*Otomatis mengikuti periode aktif sistem saat ini.</small>
-                </div>
+            <div class="mb-3">
+                <label class="fw-bold mb-1 fs-6">Nomor HP / WhatsApp</label>
+                <input type="text" name="no_hp" class="form-control rounded-3 p-2" placeholder="Contoh: 081234567890" value="{{ old('no_hp', $mahasiswa->no_hp ?? '') }}">
             </div>
         </div>
 
@@ -53,32 +61,78 @@
             <hr class="mt-0 mb-3">
 
             <div class="mb-3">
-                <label class="fw-bold mb-1 fs-6">Password Akun Login {{ isset($mahasiswa) ? '(Isi Jika Ingin Mengubah)' : 'Default *' }}</label>
+                <label class="fw-bold mb-1 fs-6">
+                    Password Akun Login {{ isset($mahasiswa) ? '(Isi Jika Ingin Mengubah)' : '*' }}
+                </label>
                 <div class="input-group">
-                    <input type="password" name="password" id="passwordInput" class="form-control rounded-start-3 p-2" {{ isset($mahasiswa) ? '' : 'required' }}>
-                    <button class="btn btn-outline-secondary rounded-end-3" type="button" onclick="togglePassword()">👁</button>
+                    <input type="text" name="password" id="passwordInput" class="form-control rounded-start-3 p-2 fw-bold" 
+                           placeholder="{{ isset($mahasiswa) ? 'Kosongkan jika tidak diubah' : 'Klik Shuffle' }}" 
+                           {{ isset($mahasiswa) ? '' : 'required' }}>
+                    <button class="btn btn-warning fw-bold px-3 text-nowrap" type="button" onclick="generateShufflePassword()">
+                        🔀 <span class="d-none d-sm-inline">Shuffle Password</span><span class="d-inline d-sm-none">Shuffle</span>
+                    </button>
+                    <button class="btn btn-outline-secondary rounded-end-3 px-3" type="button" onclick="togglePasswordVisibility()">👁️</button>
                 </div>
                 <small class="d-block text-muted mt-1">
-                    {{ isset($mahasiswa) ? 'Kosongkan jika tidak ingin mengganti password.' : '*Password ini akan digunakan mahasiswa untuk login ke sistem.' }}
+                    {{ isset($mahasiswa) 
+                        ? '*Kosongkan jika tidak ingin mengganti password, atau klik Shuffle untuk buat password baru.' 
+                        : '*Klik tombol Shuffle untuk membuat kombinasi password unik otomatis.' }}
                 </small>
             </div>
         </div>
 
-        <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-            <a href="{{ route('admin.mahasiswa.index') }}" class="btn btn-secondary rounded-pill px-4 fw-bold">Batal</a>
-            <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">💾 Simpan Data Mahasiswa</button>
+        {{-- Tombol Aksi Form Responsif & Sejajar --}}
+        <div class="d-flex flex-wrap align-items-stretch justify-content-end gap-2 pt-3 border-top">
+            <a href="{{ route('admin.mahasiswa.index') }}" 
+               class="btn btn-secondary rounded-pill px-4 py-2 fw-bold d-inline-flex align-items-center justify-content-center text-nowrap flex-fill flex-sm-grow-0">
+                Batal
+            </a>
+            <button type="submit" 
+                    class="btn btn-success rounded-pill px-4 py-2 fw-bold d-inline-flex align-items-center justify-content-center text-nowrap flex-fill flex-sm-grow-0">
+                💾 Simpan Data Mahasiswa
+            </button>
         </div>
     </form>
 </div>
 
 <script>
-    function togglePassword() {
+    const isEditMode = "{{ isset($mahasiswa) ? 'true' : 'false' }}" === "true";
+
+    function generateShufflePassword() {
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+        let newPassword = "";
+        for (let i = 0; i < 8; i++) {
+            newPassword += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        
         const passInput = document.getElementById('passwordInput');
-        if (passInput.type === 'password') {
-            passInput.type = 'text';
-        } else {
-            passInput.type = 'password';
+        passInput.value = newPassword;
+        passInput.type = 'text';
+    }
+
+    function togglePasswordVisibility() {
+        const passInput = document.getElementById('passwordInput');
+        passInput.type = passInput.type === 'password' ? 'text' : 'password';
+    }
+
+    function closeErrorNotification() {
+        const alertElement = document.getElementById('error-alert');
+        if (alertElement) {
+            alertElement.style.opacity = '0';
+            alertElement.style.transform = 'translate(-50%, -20px)';
+            setTimeout(() => { alertElement.style.display = 'none'; }, 500);
         }
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const passInput = document.getElementById('passwordInput');
+        if (!isEditMode && !passInput.value) {
+            generateShufflePassword();
+        }
+
+        setTimeout(function() {
+            closeErrorNotification();
+        }, 5000);
+    });
 </script>
 @endsection

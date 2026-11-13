@@ -13,10 +13,11 @@ class Dosen extends Model
 
     protected $fillable = [
         'user_id',
-        'periode_id', // Pastikan baris ini ada
+        'periode_id',
         'nip',
         'nama_dosen',
         'email',
+        'plain_password',
     ];
 
     public function user()

@@ -3,11 +3,11 @@
 @section('content')
 <h3 class="fw-bold mb-3" style="color: #2b3990;">Pemetaan Penempatan & Bimbingan Asistensi Mengajar</h3>
 
-{{-- Notifikasi Melayang (Floating 5 Detik) --}}
+{{-- Notifikasi Melayang Responsif (Success & Error) --}}
 @if(session('success'))
     <div id="success-alert" class="alert alert-success fade show rounded-4 d-flex align-items-center justify-content-between px-4 py-3 shadow-lg" 
          role="alert" 
-         style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; min-width: 320px; max-width: 450px; background-color: #28a745; color: white; border: none; transition: all 0.5s ease;">
+         style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 92%; max-width: 450px; background-color: #28a745; color: white; border: none; transition: all 0.5s ease;">
         <div class="d-flex align-items-center me-3">
             <i class="bi bi-check-circle-fill me-2 fs-5"></i> 
             <span class="fw-semibold">{{ session('success') }}</span>
@@ -16,48 +16,66 @@
     </div>
 @endif
 
-<div class="p-3" style="background-color: #f7ede2; border-radius: 12px;">
-    <h6 class="fw-bold mb-3"><i class="bi bi-people-fill"></i> Alokasi Mahasiswa ke Sekolah Mitra, Guru Pamong, dan Dosen Pembimbing (PILKOM ULM)</h6>
-    
-    {{-- Filter & Action Bar --}}
-    <form action="{{ route('admin.pemetaan.index') }}" method="GET" class="row g-2 align-items-center mb-3">
-        <div class="col-md-4">
-            <input type="text" name="search" class="search-input w-100" placeholder="🔍 Cari Sekolah / Dosen / Mahasiswa..." value="{{ request('search') }}">
+@if(session('error'))
+    <div id="error-alert" class="alert alert-danger fade show rounded-4 d-flex align-items-center justify-content-between px-4 py-3 shadow-lg" 
+         role="alert" 
+         style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 92%; max-width: 450px; background-color: #dc3545; color: white; border: none; transition: all 0.5s ease;">
+        <div class="d-flex align-items-center me-3">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i> 
+            <span class="fw-semibold">{{ session('error') }}</span>
         </div>
-        <div class="col-md-3">
-            <select name="periode_id" class="form-select rounded-pill" onchange="this.form.submit()">
+        <button type="button" class="btn-close btn-close-white ms-auto" onclick="closeNotification()" aria-label="Close"></button>
+    </div>
+@endif
+
+<div class="p-3" style="background-color: #f7ede2; border-radius: 12px;">
+    <h6 class="fw-bold mb-3"><i class="bi bi-diagram-3-fill"></i> Alokasi Mahasiswa ke Sekolah Mitra, Guru Pamong, dan Dosen Pembimbing (PILKOM ULM)</h6>
+    
+    {{-- Filter & Action Bar Responsif --}}
+    <form action="{{ route('admin.pemetaan.index') }}" method="GET" class="row g-2 align-items-center mb-3">
+        <div class="col-12 col-md-6 col-xl-3">
+            <input type="text" name="search" class="search-input w-100" placeholder="🔍 Cari Sekolah / Dosen / Mhs..." value="{{ request('search') }}">
+        </div>
+        <div class="col-12 col-sm-6 col-md-3 col-xl-3">
+            <select name="periode_id" class="form-select rounded-pill py-2" onchange="this.form.submit()">
                 <option value="">-- Semua Periode --</option>
                 @foreach($periodeList as $p)
                     <option value="{{ $p->id }}" {{ request('periode_id') == $p->id ? 'selected' : '' }}>{{ $p->nama_periode }}</option>
                 @endforeach
             </select>
         </div>
-        <div class="col-md-2">
-            <select name="jenjang" class="form-select rounded-pill" onchange="this.form.submit()">
+        <div class="col-12 col-sm-6 col-md-3 col-xl-2">
+            <select name="jenjang" class="form-select rounded-pill py-2" onchange="this.form.submit()">
                 <option value="">Jenjang: Semua</option>
                 <option value="SMP/MTS" {{ request('jenjang') == 'SMP/MTS' ? 'selected' : '' }}>SMP/MTS</option>
-                <option value="SMA/MA/SMK" {{ request('jenjang') == 'SMA/MA/SMK' ? 'selected' : '' }}>SMA/MA/SMK</option>
+                <option value="SMA/MA" {{ request('jenjang') == 'SMA/MA' ? 'selected' : '' }}>SMA/MA/SMK</option>
             </select>
         </div>
-        <div class="col-md-3 d-flex gap-2 justify-content-end align-items-center">
-            <a href="{{ route('admin.pemetaan.pdf') }}" class="btn btn-danger rounded-pill px-3 fw-bold text-nowrap">
+        <div class="col-12 col-xl-4 d-flex flex-wrap align-items-stretch justify-content-xl-end gap-2">
+            <a href="{{ route('admin.pemetaan.pdf') }}" target="_blank"
+               class="btn btn-danger rounded-pill px-3 py-2 fw-bold shadow-sm d-inline-flex align-items-center justify-content-center text-nowrap flex-fill flex-sm-grow-0"
+               style="line-height: 1.2;">
                 📄 Export PDF
             </a>
-            <a href="{{ route('admin.pemetaan.create') }}" class="btn-tambah text-nowrap">+ Plotting Baru</a>
+            <a href="{{ route('admin.pemetaan.create') }}" 
+               class="btn-tambah px-3 py-2 d-inline-flex align-items-center justify-content-center text-nowrap flex-fill flex-sm-grow-0"
+               style="line-height: 1.2;">
+                + Plotting Baru
+            </a>
         </div>
     </form>
 
-    {{-- Tabel Pemetaan --}}
+    {{-- Tabel Pemetaan Responsif --}}
     <div class="table-responsive">
-        <table class="table table-custom align-middle text-start">
+        <table class="table table-custom align-middle text-start" style="min-width: 1000px;">
             <thead>
-                <tr class="text-center">
+                <tr class="text-center text-nowrap">
                     <th width="4%">NO</th>
-                    <th width="24%">SEKOLAH MITRA & JENJANG</th>
-                    <th width="20%">GURU PAMONG</th>
-                    <th width="20%">DOSEN PEMBIMBING</th>
-                    <th width="24%">MAHASISWA & NO. WA</th>
-                    <th width="8%">AKSI</th>
+                    <th width="23%">SEKOLAH MITRA & JENJANG</th>
+                    <th width="19%">GURU PAMONG</th>
+                    <th width="19%">DOSEN PEMBIMBING</th>
+                    <th width="23%">MAHASISWA & NO. WA</th>
+                    <th width="12%">AKSI</th>
                 </tr>
             </thead>
             <tbody>
@@ -113,8 +131,10 @@
 
                     {{-- Column 5: Aksi --}}
                     <td class="text-center">
-                        <a href="{{ route('admin.pemetaan.edit', $item->id) }}" class="btn-action-edit d-inline-block mb-1">✏️ Edit</a>
-                        <button type="button" class="btn-action-hapus" onclick="openDeleteModal('{{ $item->id }}')">🗑️ Hapus</button>
+                        <div class="d-flex justify-content-center gap-1 text-nowrap">
+                            <a href="{{ route('admin.pemetaan.edit', $item->id) }}" class="btn-action-edit">✏️ Edit</a>
+                            <button type="button" class="btn-action-hapus" onclick="openDeleteModal('{{ $item->id }}')">🗑️ Hapus</button>
+                        </div>
                     </td>
                 </tr>
                 @empty
@@ -136,7 +156,7 @@
         <div class="modal-content rounded-4 p-4 text-center border-0 shadow">
             <div class="modal-body p-0">
                 <h5 class="fw-bold mb-3" style="color: #2b3990;">Konfirmasi Hapus</h5>
-                <p class="text-muted mb-4">Apakah Anda yakin ingin menghapus data plot bimbingan di <strong>{{ $item->sekolah->nama_sekolah }}</strong>?</p>
+                <p class="text-muted mb-4">Apakah Anda yakin ingin menghapus data plot bimbingan di <strong>{{ $item->sekolah->nama_sekolah ?? '-' }}</strong>?</p>
                 <div class="d-flex justify-content-center gap-2">
                     <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
                     <form action="{{ route('admin.pemetaan.destroy', $item->id) }}" method="POST" class="d-inline">
@@ -153,12 +173,15 @@
 
 <script>
     function closeNotification() {
-        const alertElement = document.getElementById('success-alert');
-        if (alertElement) {
-            alertElement.style.opacity = '0';
-            alertElement.style.transform = 'translate(-50%, -20px)';
-            setTimeout(() => { alertElement.style.display = 'none'; }, 500);
-        }
+        const alertSuccess = document.getElementById('success-alert');
+        const alertError = document.getElementById('error-alert');
+        [alertSuccess, alertError].forEach(alertElement => {
+            if (alertElement) {
+                alertElement.style.opacity = '0';
+                alertElement.style.transform = 'translate(-50%, -20px)';
+                setTimeout(() => { alertElement.style.display = 'none'; }, 500);
+            }
+        });
     }
 
     document.addEventListener("DOMContentLoaded", function () {
