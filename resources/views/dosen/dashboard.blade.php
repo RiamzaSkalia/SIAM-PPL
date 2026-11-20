@@ -2,24 +2,28 @@
 
 @section('content')
 @php
-    $namaDosen = $dosen->nama_dosen ?? auth()->user()->name ?? 'Dosen Pembimbing';
-    $periodeLabel = $activePeriode->nama_periode ?? ($periode ?? 'Belum Ditentukan');
+    $jmlMahasiswa = max((int) ($jumlahMahasiswa ?? ($totalMahasiswa ?? 0)), 0);
 
-    $jmlMahasiswa = $jumlahMahasiswa ?? ($totalMahasiswa ?? 0);
-    $jmlTotalLog = $totalLog ?? ($totalKonsultasi ?? 0);
-    $jmlMenunggu = $menungguVerifikasi ?? 0;
-    $jmlDisetujui = $logDisetujui ?? max($jmlTotalLog - $jmlMenunggu, 0);
+    // Hitung mahasiswa layak cetak (minimal 5 sesi disetujui/tervalidasi)
+    $mhsLayak = isset($mahasiswaLayak)
+        ? (int) $mahasiswaLayak
+        : (isset($mahasiswaLayakCetak) ? (int) $mahasiswaLayakCetak : 0);
 
-    $mhsLayak = $mahasiswaLayak ?? 0;
-    $mhsBelumLayak = $mahasiswaBelumLayak ?? max($jmlMahasiswa - $mhsLayak, 0);
+    // Batasi agar tidak melebihi total mahasiswa bimbingan
+    $mhsLayak = min(max($mhsLayak, 0), $jmlMahasiswa);
 
-    $pctLayak = $persenLayak ?? ($jmlMahasiswa > 0 ? round(($mhsLayak / $jmlMahasiswa) * 100) : 0);
-    $pctLayak = min(max((int) $pctLayak, 0), 100);
-    $pctBelumLayak = $persenBelumLayak ?? (100 - $pctLayak);
-    $pctBelumLayak = min(max((int) $pctBelumLayak, 0), 100);
+    // Hitung mahasiswa belum layak berdasarkan total mahasiswa bimbingan
+    $mhsBelumLayak = isset($mahasiswaBelumLayak)
+        ? min(max((int) $mahasiswaBelumLayak, 0), $jmlMahasiswa)
+        : max($jmlMahasiswa - $mhsLayak, 0);
 
-    $daftarLogMenunggu = $logMenunggu ?? ($konsultasiMenunggu ?? collect());
-    $daftarAktivitas = $konsultasiTerakhir ?? ($aktivitasTerakhir ?? $daftarLogMenunggu);
+    // Jika controller mengirim keduanya dan jumlahnya berbeda, utamakan konsistensi terhadap $jmlMahasiswa
+    if ($jmlMahasiswa > 0 && ($mhsLayak + $mhsBelumLayak) !== $jmlMahasiswa) {
+        $mhsBelumLayak = max($jmlMahasiswa - $mhsLayak, 0);
+    }
+
+    $pctLayak = $jmlMahasiswa > 0 ? (int) round(($mhsLayak / $jmlMahasiswa) * 100) : 0;
+    $pctBelumLayak = $jmlMahasiswa > 0 ? (int) round(($mhsBelumLayak / $jmlMahasiswa) * 100) : 0;
 @endphp
 
 {{-- Header Sambutan & Tanggal Responsif --}}
