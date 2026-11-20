@@ -24,7 +24,9 @@ class DashboardController extends Controller
 
         // Perhitungan Sesi & Progress
         $totalSesiValid = (clone $konsultasiQuery)->where('status_validasi', 'disetujui')->count();
-        $totalMenunggu  = (clone $konsultasiQuery)->where('status_validasi', 'menunggu')->count();
+        $totalMenunggu = (clone $konsultasiQuery)
+    ->whereIn('status_validasi', ['pending', 'menunggu'])
+    ->count();
         $totalDitolak   = (clone $konsultasiQuery)->where('status_validasi', 'ditolak')->count();
 
         // Persentase progress bimbingan (Target minimum 5 sesi)

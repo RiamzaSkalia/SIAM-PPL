@@ -28,41 +28,42 @@ class KonsultasiController extends Controller
     }
 
     public function store(Request $request)
-{
-    $mahasiswa = Auth::user()->mahasiswa;
+    {
+        $mahasiswa = Auth::user()->mahasiswa;
 
-    if (!$mahasiswa) {
-        return redirect()->back()->withErrors(['msg' => 'Data mahasiswa tidak ditemukan.']);
+        if (!$mahasiswa) {
+            return redirect()->back()->withErrors(['msg' => 'Data mahasiswa tidak ditemukan.']);
+        }
+
+        $plotting = $mahasiswa->plottingBimbingan->first();
+
+        if (!$plotting) {
+            return redirect()->back()->withErrors(['msg' => 'Anda belum di-plotting ke sekolah & dosen pembimbing oleh Admin.']);
+        }
+
+        // Validasi: ubah tindak_lanjut_mahasiswa dan saran_dosen menjadi required
+        $request->validate([
+            'tanggal_konsul'          => 'required|date',
+            'waktu_konsul'            => 'required',
+            'media_konsul'            => 'required|string',
+            'topik_dibahas'           => 'required|string',
+            'refleksi_mahasiswa'      => 'required|string',
+            'tindak_lanjut_mahasiswa' => 'required|string', // Wajib diisi
+            'saran_dosen'             => 'required|string', // Wajib diisi
+        ]);
+
+        Konsultasi::create([
+            'plotting_id'             => $plotting->id,
+            'tanggal_konsul'          => $request->tanggal_konsul,
+            'waktu_konsul'            => $request->waktu_konsul,
+            'media_konsul'            => $request->media_konsul,
+            'topik_dibahas'           => $request->topik_dibahas,
+            'refleksi_mahasiswa'      => $request->refleksi_mahasiswa,
+            'tindak_lanjut_mahasiswa' => $request->tindak_lanjut_mahasiswa,
+            'saran_dosen'             => $request->saran_dosen,
+            'status_validasi'         => 'pending',
+        ]);
+
+        return redirect()->route('mahasiswa.konsultasi.index')->with('success', 'Log bimbingan berhasil ditambahkan!');
     }
-
-    $plotting = $mahasiswa->plottingBimbingan->first();
-
-    if (!$plotting) {
-        return redirect()->back()->withErrors(['msg' => 'Anda belum di-plotting ke sekolah & dosen pembimbing oleh Admin.']);
-    }
-
-    $request->validate([
-        'tanggal_konsul'    => 'required|date',
-        'waktu_konsul'      => 'required',
-        'media_konsul'      => 'required|string',
-        'topik_dibahas'     => 'required|string',
-        'refleksi_mahasiswa'=> 'required|string',
-        'tindak_lanjut'     => 'nullable|string',
-        'saran_dosen'       => 'nullable|string',
-    ]);
-
-    Konsultasi::create([
-        'plotting_id'       => $plotting->id,
-        'tanggal_konsul'    => $request->tanggal_konsul,
-        'waktu_konsul'      => $request->waktu_konsul,
-        'media_konsul'      => $request->media_konsul,
-        'topik_dibahas'     => $request->topik_dibahas,
-        'refleksi_mahasiswa'=> $request->refleksi_mahasiswa,
-        'tindak_lanjut'     => $request->tindak_lanjut,
-        'saran_dosen'       => $request->saran_dosen,
-        'status_validasi'   => 'pending', // <-- Disesuaikan dengan enum DB ('pending')
-    ]);
-
-    return redirect()->route('mahasiswa.konsultasi.index')->with('success', 'Log bimbingan berhasil ditambahkan!');
-}
 }

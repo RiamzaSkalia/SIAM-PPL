@@ -46,7 +46,7 @@
                     <td class="text-start py-3">{{ $item->topik_dibahas }}</td>
                     <td class="text-start py-3">{{ $item->refleksi_mahasiswa ?? '-' }}</td>
                     <td class="text-start py-3">{{ $item->saran_dosen ?? '-' }}</td>
-                    <td class="text-start py-3">{{ $item->tindak_lanjut ?? '-' }}</td>
+                    <td class="text-start py-3">{{ $item->tindak_lanjut_mahasiswa ?? '-' }}</td>
                     <td class="py-3">
                         @if($item->status_validasi == 'disetujui')
                             <span class="badge bg-success rounded-pill px-3 py-2 fs-6">Disetujui 🟢</span>

@@ -4,96 +4,111 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'SIAM Dosen')</title>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'siam-cream': '#F9F8F6',
-                        'siam-navy': '#363E78',
-                        'siam-orange': '#FBBF51',
-                        'siam-orange-dark': '#E5AB3C',
-                        'siam-green': '#10B981',
-                    }
-                }
-            }
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background-color: #fbf3e8;
+            margin: 0;
         }
-    </script>
+        .sidebar {
+            width: 260px;
+            min-height: 100vh;
+            background-color: #2b3990;
+        }
+        .btn-siam-orange {
+            background-color: #fbbF51;
+            border: none;
+            color: #1f2937;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        .btn-siam-orange:hover {
+            background-color: #e5ab3c;
+            color: #1f2937;
+        }
+        .btn-siam-active {
+            background-color: #ffffff;
+            border: none;
+            color: #2b3990;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        .btn-siam-active:hover {
+            background-color: #f8f9fa;
+            color: #2b3990;
+        }
+    </style>
 </head>
-<body class="bg-siam-cream min-h-screen">
-    <div class="flex min-h-screen">
+<body>
+    <div class="d-flex min-vh-100">
 
         {{-- SIDEBAR KHUSUS DOSEN --}}
-        <aside class="w-72 bg-siam-navy flex flex-col justify-between py-6 px-5 shrink-0 shadow-lg">
-            <div>
-                {{-- Logo & Judul SIAM --}}
-                <div class="flex items-center gap-3 text-white mb-8 px-1">
-                    <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0 border border-white/20 shadow-inner">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4.34L12 21l7-3.48v-4.34l-7 3.82-7-3.82z"/>
-                        </svg>
-                    </div>
-                    <div class="leading-tight">
-                        <p class="font-extrabold text-xl tracking-wide text-white">SIAM</p>
-                        <p class="text-xs text-white/80 font-medium">Dosen Pembimbing</p>
-                    </div>
-                </div>
-
-                <nav class="flex flex-col gap-3">
-                    {{-- Nama Dosen / Identitas di Sidebar --}}
-                    <div class="text-sm font-bold text-center py-3 px-4 rounded-full bg-siam-orange text-gray-900 shadow-sm">
-                        {{ $dosen->nama_dosen ?? auth()->user()->name }}
-                    </div>
-
-                    @php
-                        $menuDosen = [
-                            ['label' => 'Dashboard', 'route' => 'dosen.dashboard'],
-                            ['label' => 'Mahasiswa Bimbingan', 'route' => 'dosen.mahasiswa.bimbingan'],
-                        ];
-                    @endphp
-
-                    @foreach ($menuDosen as $item)
-                        @php $active = request()->routeIs($item['route']); @endphp
-                        <a href="{{ Route::has($item['route']) ? route($item['route']) : '#' }}"
-                           class="text-sm font-bold text-center py-3 px-4 rounded-full transition shadow-sm
-                                {{ $active
-                                    ? 'bg-white text-gray-900 shadow-md'
-                                    : 'bg-siam-orange text-gray-900 hover:bg-siam-orange-dark' }}">
-                            {{ $item['label'] }}
-                        </a>
-                    @endforeach
-                </nav>
+        <aside class="sidebar d-flex flex-column align-items-center py-4 px-3 text-white flex-shrink-0 shadow">
+            {{-- Logo & Judul SIAM (Vertikal di Tengah seperti Admin) --}}
+            <div class="text-center mb-4">
+                <i class="bi bi-mortarboard-fill fs-1 text-white d-block mb-1"></i>
+                <h4 class="fw-bold mb-0 text-white">SIAM</h4>
+                <small class="text-uppercase text-white-50 fw-semibold" style="font-size: 11px; letter-spacing: 0.8px;">
+                    DOSEN PEMBIMBING
+                </small>
             </div>
 
-            {{-- TOMBOL LOGOUT --}}
-            <form method="POST" action="{{ Route::has('logout') ? route('logout') : '#' }}">
-                @csrf
-                <button type="submit"
-                        class="w-full bg-siam-orange hover:bg-siam-orange-dark text-gray-900 text-sm font-bold py-3 px-4 rounded-full transition shadow-sm">
-                    LOG OUT
-                </button>
-            </form>
+            @php
+                $menuDosen = [
+                    ['label' => 'DASHBOARD', 'route' => 'dosen.dashboard'],
+                    ['label' => 'MAHASISWA BIMBINGAN', 'route' => 'dosen.mahasiswa.bimbingan'],
+                    ['label' => 'REKOGNISI MAHASISWA', 'route' => 'dosen.rekognisi.index'],
+                ];
+            @endphp
+
+            {{-- Daftar Menu Utama --}}
+            <nav class="w-100 d-flex flex-column gap-3">
+                @foreach ($menuDosen as $item)
+                    @php $active = request()->routeIs($item['route']); @endphp
+                    <a href="{{ Route::has($item['route']) ? route($item['route']) : '#' }}"
+                       class="btn w-100 rounded-pill py-2 px-3 shadow-sm {{ $active ? 'btn-siam-active' : 'btn-siam-orange' }}"
+                       style="font-size: 13px;">
+                        {{ $item['label'] }}
+                    </a>
+                @endforeach
+
+                {{-- Tombol LOG OUT dengan jarak seperti sidebar admin --}}
+                <form method="POST" action="{{ Route::has('logout') ? route('logout') : '#' }}" class="mt-2">
+                    @csrf
+                    <button type="submit"
+                            class="btn btn-siam-orange w-100 rounded-pill py-2 px-3 shadow-sm"
+                            style="font-size: 13px;">
+                        LOG OUT
+                    </button>
+                </form>
+            </nav>
         </aside>
 
         {{-- KONTEN UTAMA --}}
-        <main class="flex-1 flex flex-col">
-            <div class="bg-white px-8 py-5 border-b border-gray-100 shadow-sm">
-                <h1 class="text-xl font-bold text-gray-800">@yield('page-title')</h1>
-            </div>
+        <div class="flex-grow-1 d-flex flex-column min-w-0">
+            @hasSection('page-title')
+                <div class="bg-white px-4 py-3 border-bottom shadow-sm">
+                    <h4 class="fw-bold mb-0 text-dark">@yield('page-title')</h4>
+                </div>
+            @endif
 
-            <div class="p-8 flex-1">
+            <div class="p-3 p-md-4 flex-grow-1">
                 @if (session('success'))
-                    <div class="mb-4 rounded-lg bg-siam-green/10 border border-siam-green text-siam-green px-4 py-3 text-sm font-medium">
+                    <div class="alert alert-success rounded-4 border-0 shadow-sm mb-4 fw-semibold">
                         {{ session('success') }}
                     </div>
                 @endif
 
                 @yield('content')
             </div>
-        </main>
+        </div>
     </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

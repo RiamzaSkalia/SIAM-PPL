@@ -14,6 +14,8 @@ class PengajuanRekognisi extends Model
     protected $fillable = [
         'mahasiswa_id',
         'matkul_rekognisi_id',
+        'bukti_pendukung', // Tambahkan ini agar file bisa tersimpan
+        'status',
     ];
 
     public function mahasiswa()

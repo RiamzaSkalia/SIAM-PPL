@@ -1,60 +1,96 @@
 @extends('layouts.dosen')
 
-@section('title', 'Mahasiswa Bimbingan — Dosen Pembimbing')
 @section('page-title', 'Mahasiswa Bimbingan')
 
 @section('content')
-<div class="max-w-7xl mx-auto space-y-6">
-    
-    <!-- Card Utama -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h3 class="text-base font-extrabold text-gray-800 mb-6">Daftar Mahasiswa Bimbingan</h3>
-        
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+@php
+    $daftarMahasiswa = $mahasiswaBimbingan
+        ?? $mahasiswas
+        ?? $mahasiswa
+        ?? $bimbingan
+        ?? $plotting
+        ?? collect();
+@endphp
+
+<div class="container-fluid px-0">
+    <div class="mb-4">
+        <h3 class="fw-bold mb-1" style="color: #2b3990;">Daftar Mahasiswa Bimbingan</h3>
+        <p class="text-muted mb-0" style="font-size: 14px;">
+            Daftar mahasiswa yang dibimbing dan dimonitor perkembangannya pada periode aktif.
+        </p>
+    </div>
+
+    <div class="p-3 p-md-4 bg-white rounded-4 shadow-sm">
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="font-size: 14px;">
                 <thead>
-                    <tr class="text-gray-600 border-b border-gray-100 bg-[#FFF8EE]/50 font-bold">
-                        <th class="py-4 px-6 rounded-l-xl">Nama</th>
-                        <th class="py-4 px-6">NIM</th>
-                        <th class="py-4 px-6">Bimbingan</th>
-                        <th class="py-4 px-6">Status</th>
-                        <th class="py-4 px-6 rounded-r-xl text-center">Aksi</th>
+                    <tr class="text-muted border-bottom">
+                        <th class="py-3 px-3 fw-semibold">Nama</th>
+                        <th class="py-3 px-3 fw-semibold">NIM</th>
+                        <th class="py-3 px-3 fw-semibold">Bimbingan</th>
+                        <th class="py-3 px-3 fw-semibold">Status</th>
+                        <th class="py-3 px-3 fw-semibold text-end">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-50">
-                    @forelse ($mahasiswas ?? [] as $mhs)
-                        <tr class="hover:bg-gray-50/50 transition">
-                            <td class="py-4 px-6 font-extrabold text-gray-800">
-                                {{ $mhs->nama_mahasiswa ?? $mhs->nama }}
-                            </td>
-                            <td class="py-4 px-6 text-gray-600 font-medium">
-                                {{ $mhs->nim }}
-                            </td>
-                            <td class="py-4 px-6 text-gray-700 font-bold">
-                                {{ $mhs->jumlah_bimbingan ?? 0 }}/5
-                            </td>
-                            <td class="py-4 px-6">
-                                @if($mhs->status_memenuhi)
-                                    <span class="inline-block bg-emerald-100 text-emerald-700 font-extrabold text-xs px-3 py-1 rounded-full">
+                <tbody>
+                    @forelse ($daftarMahasiswa as $item)
+                        @php
+                            // Menangani jika $item berupa model Mahasiswa langsung atau objek plotting/bimbingan
+                            $mhs = $item->mahasiswa ?? $item;
+                            $idMhs = $mhs->id ?? $item->mahasiswa_id ?? $item->id ?? null;
+                            $namaMhs = $mhs->nama_mahasiswa
+                                ?? $mhs->nama
+                                ?? $mhs->nama_mhs
+                                ?? optional($mhs->user)->name
+                                ?? '-';
+                            $nimMhs = $mhs->nim ?? '-';
+
+                            $jumlahValidasi = $item->jumlah_bimbingan_valid
+                                ?? $item->jumlah_bimbingan
+                                ?? $mhs->jumlah_bimbingan_valid
+                                ?? $mhs->konsultasi_disetujui_count
+                                ?? $mhs->konsultasi_valid_count
+                                ?? 0;
+                            $targetMinimal = $item->target_bimbingan ?? 5;
+                            $memenuhi = $jumlahValidasi >= $targetMinimal;
+
+                            $detailUrl = '#';
+                            if ($idMhs && Route::has('dosen.mahasiswa.detail')) {
+                                $detailUrl = route('dosen.mahasiswa.detail', $idMhs);
+                            } elseif ($idMhs && Route::has('dosen.mahasiswa.show')) {
+                                $detailUrl = route('dosen.mahasiswa.show', $idMhs);
+                            }
+                        @endphp
+                        <tr class="border-bottom">
+                            <td class="py-3 px-3 fw-bold text-dark">{{ $namaMhs }}</td>
+                            <td class="py-3 px-3 text-secondary">{{ $nimMhs }}</td>
+                            <td class="py-3 px-3 text-dark fw-medium">{{ $jumlahValidasi }}/{{ $targetMinimal }}</td>
+                            <td class="py-3 px-3">
+                                @if ($memenuhi)
+                                    <span class="badge rounded-pill px-3 py-2 fw-semibold"
+                                          style="background-color: #d3f9d8; color: #2b8a3e; font-size: 12px;">
                                         Memenuhi
                                     </span>
                                 @else
-                                    <span class="inline-block bg-amber-100 text-amber-800 font-extrabold text-xs px-3 py-1 rounded-full">
+                                    <span class="badge rounded-pill px-3 py-2 fw-semibold"
+                                          style="background-color: #fff3bf; color: #9c6b00; font-size: 12px;">
                                         Belum Memenuhi
                                     </span>
                                 @endif
                             </td>
-                            <td class="py-4 px-6 text-center">
-                                <a href="{{ route('dosen.mahasiswa.detail', $mhs->id) }}" 
-                                   class="inline-block bg-[#363E78] hover:bg-[#282f5c] text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm">
+                            <td class="py-3 px-3 text-end">
+                                <a href="{{ $detailUrl }}"
+                                   class="btn btn-sm text-white rounded-3 px-3 py-1 fw-semibold"
+                                   style="background-color: #2b3990; font-size: 12px;">
                                     Lihat Detail
                                 </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-12 text-center text-gray-400">
-                                Belum ada mahasiswa yang masuk dalam plotting bimbingan Anda.
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                Belum ada data mahasiswa bimbingan yang terdaftar.
                             </td>
                         </tr>
                     @endforelse
@@ -62,6 +98,5 @@
             </table>
         </div>
     </div>
-
 </div>
 @endsection

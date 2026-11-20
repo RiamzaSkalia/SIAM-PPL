@@ -58,15 +58,15 @@
         </div>
 
         <div class="mb-4">
-            <label class="form-label fw-bold">Tindak Lanjut Mahasiswa</label>
+            <label class="form-label fw-bold">Tindak Lanjut Mahasiswa <span class="text-danger">*</span></label>
             <small class="text-muted d-block mb-2 fs-6">Langkah apa yang akan Anda lakukan setelah sesi bimbingan ini?</small>
-            <textarea name="tindak_lanjut" class="form-control" rows="2" placeholder="Contoh: Melakukan revisi struktur modul sesuai saran dosen">{{ old('tindak_lanjut') }}</textarea>
+            <textarea name="tindak_lanjut_mahasiswa" class="form-control rounded-3" rows="3" placeholder="Contoh: Melakukan revisi struktur modul sesuai saran dosen" required>{{ old('tindak_lanjut_mahasiswa') }}</textarea>
         </div>
 
         <div class="mb-4">
-            <label class="form-label fw-bold">Saran / Umpan Balik Dosen (Opsional)</label>
+            <label class="form-label fw-bold">Saran / Umpan Balik Dosen <span class="text-danger">*</span></label>
             <small class="text-muted d-block mb-2 fs-6">Dapat diisi jika Dosen sudah memberikan catatan lisan saat sesi konsultasi</small>
-            <textarea name="saran_dosen" class="form-control" rows="2" placeholder="Contoh: Perjelas indikator capaian pembelajaran pada bab 2">{{ old('saran_dosen') }}</textarea>
+            <textarea name="saran_dosen" class="form-control" rows="2" placeholder="Contoh: Perjelas indikator capaian pembelajaran pada bab 2" required>{{ old('saran_dosen') }}</textarea>
         </div>
 
         <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">

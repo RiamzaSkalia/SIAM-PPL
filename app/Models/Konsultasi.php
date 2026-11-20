@@ -25,7 +25,7 @@ class Konsultasi extends Model
         'topik_dibahas',
         'refleksi_mahasiswa',
         'saran_dosen',
-        'tindak_lanjut_mahasiswa',
+        'tindak_lanjut',
         'paraf_mahasiswa',
         'paraf_dosen',
         'status_validasi',

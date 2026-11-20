@@ -30,6 +30,6 @@ class DokumenController extends Controller
             // kamu bisa menyimpannya ke model di sini (misal: DokumenMahasiswa::create(...))
         }
 
-        return redirect()->back()->with('success', 'Dokumen pendukung berhasil diupload!');
+        return redirect()->back()->with('success', 'Dokumen pendukung berhasil diunggah!');
     }
 }

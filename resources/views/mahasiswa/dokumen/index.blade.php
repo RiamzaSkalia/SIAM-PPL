@@ -7,23 +7,30 @@
         <h3 class="fw-bold mb-1" style="color: #2b3990;">Upload Dokumen</h3>
     </div>
 
-    {{-- Alert Notifikasi --}}
-    @if(session('success'))
-        <div class="alert alert-success rounded-4 border-0 shadow-sm mb-4 fw-semibold">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="alert alert-danger rounded-4 border-0 shadow-sm mb-4 fw-semibold">
-            {{ session('error') }}
-        </div>
-    @endif
-
     {{-- Form Upload Dokumen --}}
     <div class="card border-0 shadow-sm rounded-4 p-4" style="background-color: #f7ede2;">
+        
+        {{-- Alert Notifikasi disamakan persis dengan halaman konsultasi --}}
+        @if(session('success'))
+            <div class="alert alert-success d-flex align-items-center rounded-3 border-0 shadow-sm mb-4" role="alert" style="background-color: #d1e7dd; color: #0f5132;">
+                <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                <div class="fw-semibold">
+                    {{ session('success') }}
+                </div>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger d-flex align-items-center rounded-3 border-0 shadow-sm mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                <div class="fw-semibold">
+                    {{ session('error') }}
+                </div>
+            </div>
+        @endif
+
         <div class="mb-3">
-            <h5 class="fw-bold text-dark mb-1">Upload Dokumen Pendukung</h5>
+            <h5 class="fw-bold text-dark mb-1">Form Unggah Berkas</h5>
             <p class="text-muted small">Unggah laporan, atau dokumen pendukung bimbingan Anda di sini.</p>
         </div>
 
@@ -32,7 +39,7 @@
 
             <!-- Jenis Dokumen -->
             <div class="mb-3">
-                <label class="form-label fw-bold text-dark">Jenis Dokumen</label>
+                <label class="form-label fw-bold text-dark">Jenis Dokumen <span class="text-danger">*</span></label>
                 <select name="jenis_dokumen" required class="form-select rounded-3 py-2">
                     <option value="" disabled selected>seperti Laporan Mingguan, Perangkat Pembelajaran, dll</option>
                     <option value="Laporan Mingguan">Laporan Mingguan</option>
@@ -43,7 +50,7 @@
 
             <!-- File Upload Area (Gaya Drag & Drop / Klik) -->
             <div class="mb-3">
-                <label class="form-label fw-bold text-dark">File</label>
+                <label class="form-label fw-bold text-dark">File <span class="text-danger">*</span></label>
                 <div class="border border-2 border-dashed rounded-3 p-4 text-center bg-white position-relative" style="cursor: pointer; border-color: #cbd5e1 !important;" onclick="document.getElementById('fileInput').click();">
                     <div class="mb-2">
                         <i class="bi bi-upload fs-3 text-secondary"></i>

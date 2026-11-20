@@ -12,7 +12,6 @@ class VerifikasiController extends Controller
     {
         $konsultasi = Konsultasi::findOrFail($id);
 
-        // Ubah 'status' menjadi 'status_validasi' dan nilainya jadi huruf kecil 'disetujui'
         $konsultasi->update([
             'status_validasi' => 'disetujui', 
         ]);
@@ -24,12 +23,23 @@ class VerifikasiController extends Controller
     {
         $konsultasi = Konsultasi::findOrFail($id);
         
-        // Ubah 'status' menjadi 'status_validasi' dan nilainya jadi huruf kecil 'ditolak'
         $konsultasi->update([
             'status_validasi' => 'ditolak',
-            'saran_dosen' => $request->catatan ?? $konsultasi->saran_dosen, // Sesuaikan jika kolom catatan di tabel bernama saran_dosen
+            'saran_dosen' => $request->catatan ?? $konsultasi->saran_dosen,
         ]);
 
         return redirect()->back()->with('success', 'Konsultasi ditolak.');
+    }
+
+    public function verify($id)
+    {
+        // Supaya sinkron dengan rute dan fungsi setujui, arahkan ke kolom yang benar
+        $konsultasi = Konsultasi::findOrFail($id);
+
+        $konsultasi->update([
+            'status_validasi' => 'disetujui', 
+        ]);
+
+        return redirect()->back()->with('success', 'Konsultasi berhasil disetujui.');
     }
 }

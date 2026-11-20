@@ -4,107 +4,150 @@
 @section('page-title', 'Detail Mahasiswa Bimbingan')
 
 @section('content')
-<div class="max-w-7xl mx-auto space-y-6">
-    
-    <!-- Informasi Mahasiswa -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-            <h2 class="text-xl font-extrabold text-gray-800">{{ $mahasiswa->nama_mahasiswa ?? $mahasiswa->nama }}</h2>
-            <p class="text-sm text-gray-500 mt-1">NIM: <span class="font-bold text-gray-700">{{ $mahasiswa->nim }}</span></p>
-            <p class="text-sm text-gray-500 mt-0.5">Total Bimbingan Disetujui: <span class="font-bold text-gray-700">{{ $jumlahBimbingan }}/5</span></p>
-        </div>
-        <div class="flex items-center gap-3">
-            <div>
-                @if($statusMemenuhi)
-                    <span class="inline-block bg-emerald-100 text-emerald-700 font-extrabold text-xs px-4 py-2 rounded-xl">
-                        Status: Memenuhi
-                    </span>
-                @else
-                    <span class="inline-block bg-amber-100 text-amber-800 font-extrabold text-xs px-4 py-2 rounded-xl">
-                        Status: Belum Memenuhi
-                    </span>
-                @endif
-            </div>
+@php
+    $namaMhs = $mahasiswa->nama_mahasiswa ?? $mahasiswa->nama ?? '-';
+    $nimMhs = $mahasiswa->nim ?? '-';
+    $jmlBimbingan = $jumlahBimbingan ?? 0;
+    $targetBimbingan = $targetBimbingan ?? 5;
+    $memenuhi = $statusMemenuhi ?? ($jmlBimbingan >= $targetBimbingan);
+@endphp
 
-            <!-- Tombol Cetak Kartu (Aktif jika >= 5) -->
-            @if($statusMemenuhi)
-                <a href="#" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-sm inline-flex items-center gap-2">
-                    🖨️ Cetak Kartu
+<div class="container-fluid px-0">
+    <!-- Informasi Mahasiswa -->
+    <div class="p-3 p-md-4 bg-white rounded-4 shadow-sm mb-4 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+        <div>
+            <h4 class="fw-bold mb-1" style="color: #2b3990;">{{ $namaMhs }}</h4>
+            <p class="text-muted mb-1" style="font-size: 14px;">
+                NIM: <strong class="text-dark">{{ $nimMhs }}</strong>
+            </p>
+            <p class="text-muted mb-0" style="font-size: 14px;">
+                Total Bimbingan Disetujui: <strong class="text-dark">{{ $jmlBimbingan }}/{{ $targetBimbingan }}</strong>
+            </p>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            @if($memenuhi)
+                <span class="badge rounded-pill px-3 py-2 fw-bold"
+                      style="background-color: #d3f9d8; color: #2b8a3e; font-size: 12px;">
+                    Status: Memenuhi
+                </span>
+            @else
+                <span class="badge rounded-pill px-3 py-2 fw-bold"
+                      style="background-color: #fff3bf; color: #9c6b00; font-size: 12px;">
+                    Status: Belum Memenuhi
+                </span>
+            @endif
+
+            <!-- Tombol Cetak Kartu (Aktif jika >= target) -->
+            @if($memenuhi)
+                <a href="{{ Route::has('dosen.mahasiswa.cetak') ? route('dosen.mahasiswa.cetak', $mahasiswa->id) : '#' }}"
+                   target="_blank"
+                   class="btn btn-sm btn-success rounded-pill px-3 py-2 fw-bold d-inline-flex align-items-center gap-1"
+                   style="font-size: 12px;">
+                    <i class="bi bi-printer"></i>
+                    <span>Cetak Kartu</span>
                 </a>
             @else
-                <button disabled class="bg-gray-200 text-gray-400 font-bold text-xs px-5 py-2.5 rounded-xl cursor-not-allowed">
-                    Cetak Kartu (Belum 5/5)
+                <button type="button"
+                        disabled
+                        class="btn btn-sm btn-secondary rounded-pill px-3 py-2 fw-bold opacity-50"
+                        style="font-size: 12px;">
+                    Cetak Kartu (Belum {{ $jmlBimbingan }}/{{ $targetBimbingan }})
                 </button>
             @endif
         </div>
     </div>
 
     <!-- Riwayat & Log Konsultasi -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
-        <h3 class="text-base font-extrabold text-gray-800">Riwayat Konsultasi & Verifikasi</h3>
+    <div class="p-3 p-md-4 bg-white rounded-4 shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0" style="color: #2b3990; font-size: 15px;">
+                RIWAYAT KONSULTASI & VERIFIKASI
+            </h6>
+            <a href="{{ Route::has('dosen.mahasiswa.bimbingan') ? route('dosen.mahasiswa.bimbingan') : '#' }}"
+               class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold"
+               style="font-size: 12px;">
+                <i class="bi bi-arrow-left me-1"></i> Kembali
+            </a>
+        </div>
 
-        <div class="space-y-4">
+        <div class="d-flex flex-column gap-3">
             @forelse($konsultasis as $log)
-                <div class="border border-gray-100 bg-gray-50/50 rounded-2xl p-5 space-y-3">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-gray-100 pb-3">
+                @php
+                    $statusVal = strtolower($log->status_validasi ?? 'menunggu');
+                    $isMenunggu = in_array($statusVal, ['pending', 'menunggu', 'menunggu verifikasi', '']);
+                @endphp
+                <div class="border rounded-4 p-3 p-md-4 bg-light bg-opacity-50">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 border-bottom pb-3 mb-3">
                         <div>
-                            <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">{{ $log->media ?? 'Tatap Muka' }}</span>
-                            <h4 class="text-sm font-extrabold text-gray-800 mt-0.5">Topik: {{ $log->topik_dibahas }}</h4>
+                            <div class="text-uppercase fw-bold" style="font-size: 11px; color: #2b3990; letter-spacing: 0.4px;">
+                                {{ $log->media ?? 'Tatap Muka' }}
+                            </div>
+                            <h6 class="fw-bold text-dark mb-0 mt-1">
+                                Topik: {{ $log->topik_dibahas }}
+                            </h6>
                         </div>
+
                         <div>
-                            @if($log->status_validasi == 'disetujui')
-                                <span class="bg-emerald-100 text-emerald-700 text-xs font-extrabold px-3 py-1 rounded-full">Disetujui</span>
-                            @elseif($log->status_validasi == 'ditolak')
-                                <span class="bg-rose-100 text-rose-700 text-xs font-extrabold px-3 py-1 rounded-full">Ditolak</span>
+                            @if($statusVal === 'disetujui')
+                                <span class="badge rounded-pill px-3 py-2 fw-bold"
+                                      style="background-color: #d3f9d8; color: #2b8a3e; font-size: 12px;">
+                                    Disetujui
+                                </span>
+                            @elseif($statusVal === 'ditolak')
+                                <span class="badge rounded-pill px-3 py-2 fw-bold"
+                                      style="background-color: #ffe3e3; color: #c92a2a; font-size: 12px;">
+                                    Ditolak
+                                </span>
                             @else
-                                <span class="bg-amber-100 text-amber-800 text-xs font-extrabold px-3 py-1 rounded-full">Menunggu Verifikasi</span>
+                                <span class="badge rounded-pill px-3 py-2 fw-bold"
+                                      style="background-color: #fff3bf; color: #9c6b00; font-size: 12px;">
+                                    Menunggu Verifikasi
+                                </span>
                             @endif
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div>
-                            <p class="text-xs text-gray-400 font-bold">Tanggal & Waktu:</p>
-                            <p class="text-gray-700 font-medium mt-0.5">{{ \Carbon\Carbon::parse($log->tanggal_konsul)->format('d F Y') }}</p>
+                    <div class="row g-3" style="font-size: 14px;">
+                        <div class="col-12 col-md-6">
+                            <div class="text-muted fw-semibold small">Tanggal &amp; Waktu:</div>
+                            <div class="text-dark fw-medium mt-1">
+                                {{ !empty($log->tanggal_konsul) ? \Carbon\Carbon::parse($log->tanggal_konsul)->translatedFormat('d F Y') : '-' }}
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-xs text-gray-400 font-bold">Hasil / Saran Dosen:</p>
-                            <p class="text-gray-700 font-medium mt-0.5">{{ $log->saran_dosen ?? 'Belum ada catatan saran.' }}</p>
+                        <div class="col-12 col-md-6">
+                            <div class="text-muted fw-semibold small">Hasil / Saran Dosen:</div>
+                            <div class="text-dark fw-medium mt-1">
+                                {{ $log->saran_dosen ?? 'Belum ada catatan saran.' }}
+                            </div>
                         </div>
                     </div>
 
                     <!-- Tombol Aksi Verifikasi Dosen -->
-                    <!-- Tombol Aksi Verifikasi Dosen -->
-                    @if($log->status_validasi == 'pending' || $log->status_validasi == 'menunggu verifikasi' || empty($log->status_validasi))
-                        <!-- Tombol Aksi Verifikasi Dosen -->
-                    <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-                        <form action="{{ route('dosen.konsultasi.setujui', $log->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" 
-                                    class="font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm {{ ($log->status_validasi == 'disetujui') ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white' }}"
-                                    {{ ($log->status_validasi == 'disetujui' || $log->status_validasi == 'ditolak') ? 'disabled' : '' }}>
-                                Setujui
-                            </button>
-                        </form>
+                    @if($isMenunggu)
+                        <div class="d-flex align-items-center gap-2 pt-3 mt-3 border-top">
+                            <form action="{{ Route::has('dosen.konsultasi.setujui') ? route('dosen.konsultasi.setujui', $log->id) : '#' }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 py-1 fw-bold">
+                                    <i class="bi bi-check-lg me-1"></i> Setujui
+                                </button>
+                            </form>
 
-                        <form action="{{ route('dosen.konsultasi.tolak', $log->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" 
-                                    class="font-bold text-xs px-4 py-2 rounded-xl transition shadow-sm {{ ($log->status_validasi == 'ditolak') ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-rose-600 hover:bg-rose-700 text-white' }}"
-                                    {{ ($log->status_validasi == 'disetujui' || $log->status_validasi == 'ditolak') ? 'disabled' : '' }}>
-                                Tolak
-                            </button>
-                        </form>
-                    </div>
+                            <form action="{{ Route::has('dosen.konsultasi.tolak') ? route('dosen.konsultasi.tolak', $log->id) : '#' }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3 py-1 fw-bold">
+                                    <i class="bi bi-x-lg me-1"></i> Tolak
+                                </button>
+                            </form>
+                        </div>
                     @endif
                 </div>
             @empty
-                <div class="text-center py-12 text-gray-400 text-sm">
+                <div class="text-center py-5 text-muted" style="font-size: 14px;">
                     Belum ada riwayat log bimbingan yang diajukan oleh mahasiswa ini.
                 </div>
             @endforelse
         </div>
     </div>
-
 </div>
 @endsection

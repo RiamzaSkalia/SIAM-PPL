@@ -81,7 +81,10 @@ class DashboardController extends Controller
             }
         }
 
-        return view('dosen.mahasiswa_bimbingan', compact('dosen', 'mahasiswas'));
+        // Menyediakan variabel ganda untuk memastikan view terbaca dengan benar
+        $mahasiswaList = $mahasiswas;
+
+        return view('dosen.mahasiswa_bimbingan', compact('dosen', 'mahasiswas', 'mahasiswaList'));
     }
 
     public function detailMahasiswa($id): View

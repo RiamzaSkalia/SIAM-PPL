@@ -18,7 +18,8 @@ class Mahasiswa extends Model
         'nim',
         'nama_mahasiswa',
         'no_hp',
-        'plain_password',
+        'plain_password',       
+        'max_sks_rekognisi',    
     ];
 
     // Relasi Banyak ke Banyak melalui pivot plotting_mahasiswa
@@ -36,5 +37,10 @@ class Mahasiswa extends Model
     public function plotting(): BelongsToMany
     {
         return $this->plottingBimbingan();
+    }
+
+    public function pengajuanRekognisi()
+    {
+        return $this->hasMany(PengajuanRekognisi::class, 'mahasiswa_id', 'id');
     }
 }

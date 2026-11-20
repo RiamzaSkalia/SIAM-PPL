@@ -115,10 +115,12 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/', 'store')->name('store');
         });
 
-        // Route Mata Kuliah Rekognisi
+        // Route Mata Kuliah Rekognisi (Diperbarui dengan rute create & destroy)
         Route::controller(MahasiswaRekognisiController::class)->prefix('rekognisi')->name('rekognisi.')->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::post('/', 'store')->name('store');
+            Route::get('/', 'index')->name('index');              // Halaman Daftar
+            Route::get('/tambah', 'create')->name('create');      // Halaman Form Input
+            Route::post('/', 'store')->name('store');             // Proses Simpan
+            Route::delete('/{id}', 'destroy')->name('destroy');   // Proses Hapus Data
         });
 
         // Route Upload Dokumen Mahasiswa
@@ -134,6 +136,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [DosenDashboardController::class, 'index'])->name('dashboard');
 
         Route::controller(VerifikasiController::class)->prefix('konsultasi')->name('konsultasi.')->group(function () {
+            Route::get('/{id}/verify', 'verify')->name('verify');
             Route::post('/{konsultasi}/setujui', 'setujui')->name('setujui');
             Route::post('/{konsultasi}/tolak', 'tolak')->name('tolak');
         });
@@ -141,8 +144,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/mahasiswa-bimbingan', [DosenDashboardController::class, 'mahasiswaBimbingan'])->name('mahasiswa.bimbingan');
         Route::get('/mahasiswa-bimbingan/{id}', [DosenDashboardController::class, 'detailMahasiswa'])->name('mahasiswa.detail');
 
-        // Route Monitoring Rekognisi Matkul Mahasiswa
-        Route::get('/rekognisi', [DosenRekognisiController::class, 'index'])->name('rekognisi.index');
+        // Route Monitoring & Update Rekognisi Matkul Mahasiswa oleh DPL
+        // Route Monitoring & Detail Rekognisi Mahasiswa oleh DPL
+Route::get('/rekognisi', [DosenRekognisiController::class, 'index'])->name('rekognisi.index');
+Route::put('/rekognisi/update/{id}', [DosenRekognisiController::class, 'update'])->name('rekognisi.update');
+Route::get('/rekognisi/{mahasiswa_id}', [DosenRekognisiController::class, 'show'])->name('rekognisi.show');
+Route::put('/rekognisi/{mahasiswa_id}/update-batas', [DosenRekognisiController::class, 'updateBatasSks'])->name('rekognisi.updateBatas');
+
     });
 
 });
