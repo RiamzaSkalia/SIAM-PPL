@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Dosen;
 
 use App\Http\Controllers\Controller;
+use App\Models\Dosen;
+use App\Models\Konsultasi;
+use App\Models\Mahasiswa;
+use App\Models\PlottingBimbingan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
-use App\Models\Dosen;
-use App\Models\Mahasiswa;
-use App\Models\PlottingBimbingan;
-use App\Models\Konsultasi;
 
 class DashboardController extends Controller
 {
@@ -25,25 +25,49 @@ class DashboardController extends Controller
         $jumlahMahasiswa = 0;
         $totalLog = 0;
         $menungguVerifikasi = 0;
+        $logDisetujui = 0;
+        $mahasiswaLayak = 0;
+        $mahasiswaBelumLayak = 0;
         $logMenunggu = collect();
 
         if ($dosen) {
-            // 1. Ambil seluruh ID plotting milik dosen ini
             $plottingIds = PlottingBimbingan::where('dosen_id', $dosen->id)->pluck('id');
 
-            // 2. Hitung jumlah mahasiswa bimbingan dari tabel pivot 'plotting_mahasiswa'
-            $jumlahMahasiswa = DB::table('plotting_mahasiswa')
+            $pivotRows = DB::table('plotting_mahasiswa')
                 ->whereIn('plotting_id', $plottingIds)
-                ->count();
+                ->get(['mahasiswa_id', 'plotting_id']);
 
-            // 3. Ambil log konsultasi berdasarkan 'plotting_id'
+            $jumlahMahasiswa = $pivotRows->pluck('mahasiswa_id')->unique()->count();
+
             $logBimbingan = Konsultasi::whereIn('plotting_id', $plottingIds)
                 ->latest()
                 ->get();
-                
+
             $totalLog = $logBimbingan->count();
             $logMenunggu = $logBimbingan->where('status_validasi', 'pending');
             $menungguVerifikasi = $logMenunggu->count();
+            $logDisetujui = $logBimbingan->where('status_validasi', 'disetujui')->count();
+
+            $plottingByMahasiswa = $pivotRows
+                ->groupBy('mahasiswa_id')
+                ->map(fn ($items) => $items->pluck('plotting_id')->unique());
+
+            $disetujuiByPlotting = $logBimbingan
+                ->where('status_validasi', 'disetujui')
+                ->groupBy('plotting_id')
+                ->map->count();
+
+            foreach ($plottingByMahasiswa as $mhsPlottingIds) {
+                $sesiDisetujuiMhs = $mhsPlottingIds->sum(
+                    fn ($pid) => (int) ($disetujuiByPlotting->get($pid, 0))
+                );
+
+                if ($sesiDisetujuiMhs >= 5) {
+                    $mahasiswaLayak++;
+                } else {
+                    $mahasiswaBelumLayak++;
+                }
+            }
         }
 
         return view('dosen.dashboard', compact(
@@ -51,6 +75,9 @@ class DashboardController extends Controller
             'jumlahMahasiswa',
             'totalLog',
             'menungguVerifikasi',
+            'logDisetujui',
+            'mahasiswaLayak',
+            'mahasiswaBelumLayak',
             'logMenunggu'
         ));
     }
@@ -81,7 +108,6 @@ class DashboardController extends Controller
             }
         }
 
-        // Menyediakan variabel ganda untuk memastikan view terbaca dengan benar
         $mahasiswaList = $mahasiswas;
 
         return view('dosen.mahasiswa_bimbingan', compact('dosen', 'mahasiswas', 'mahasiswaList'));
@@ -95,11 +121,11 @@ class DashboardController extends Controller
         $mhsPlottingIds = DB::table('plotting_mahasiswa')
             ->where('mahasiswa_id', $id)
             ->pluck('plotting_id');
-        
+
         $konsultasis = Konsultasi::whereIn('plotting_id', $mhsPlottingIds)
             ->latest()
             ->get();
-        
+
         $jumlahBimbingan = $konsultasis->where('status_validasi', 'disetujui')->count();
         $statusMemenuhi = $jumlahBimbingan >= 5;
 

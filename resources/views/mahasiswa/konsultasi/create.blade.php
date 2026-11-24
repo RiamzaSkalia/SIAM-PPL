@@ -60,7 +60,7 @@
         <div class="mb-4">
             <label class="form-label fw-bold">Tindak Lanjut Mahasiswa <span class="text-danger">*</span></label>
             <small class="text-muted d-block mb-2" style="font-size: 14px;">Langkah apa yang akan Anda lakukan setelah sesi bimbingan ini?</small>
-            <textarea name="tindak_lanjut_mahasiswa" class="form-control rounded-3" rows="3" placeholder="Contoh: Melakukan revisi struktur modul sesuai saran dosen" required>{{ old('tindak_lanjut_mahasiswa') }}</textarea>
+            <textarea name="tindak_lanjut" class="form-control rounded-3" rows="3" placeholder="Contoh: Melakukan revisi struktur modul sesuai saran dosen" required>{{ old('tindak_lanjut') }}</textarea>
         </div>
 
         <div class="mb-4">

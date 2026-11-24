@@ -2,7 +2,13 @@
 
 @section('content')
 @php
+    $namaDosen = $dosen->nama_dosen ?? auth()->user()->name ?? 'Dosen Pembimbing';
+    $periodeLabel = $activePeriode->nama_periode ?? ($periode ?? 'Belum Ditentukan');
+
     $jmlMahasiswa = max((int) ($jumlahMahasiswa ?? ($totalMahasiswa ?? 0)), 0);
+    $jmlTotalLog = max((int) ($totalLog ?? ($totalKonsultasi ?? 0)), 0);
+    $jmlMenunggu = max((int) ($menungguVerifikasi ?? 0), 0);
+    $jmlDisetujui = max((int) ($logDisetujui ?? max($jmlTotalLog - $jmlMenunggu, 0)), 0);
 
     // Hitung mahasiswa layak cetak (minimal 5 sesi disetujui/tervalidasi)
     $mhsLayak = isset($mahasiswaLayak)
@@ -24,15 +30,18 @@
 
     $pctLayak = $jmlMahasiswa > 0 ? (int) round(($mhsLayak / $jmlMahasiswa) * 100) : 0;
     $pctBelumLayak = $jmlMahasiswa > 0 ? (int) round(($mhsBelumLayak / $jmlMahasiswa) * 100) : 0;
+
+    $daftarLogMenunggu = $logMenunggu ?? ($konsultasiMenunggu ?? collect());
+    $daftarAktivitas = $konsultasiTerakhir ?? ($aktivitasTerakhir ?? $daftarLogMenunggu);
 @endphp
 
 {{-- Header Sambutan & Tanggal Responsif --}}
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mb-4">
-    <div>
-        <h3 class="fw-bold m-0" style="color: #2b3990;">Selamat Datang, {{ $namaDosen }}!</h3>
-        <p class="text-muted m-0 mt-1" style="font-size: 14px;">
+    <div class="min-w-0">
+        <h3 class="fw-bold m-0 fs-4 fs-md-3 text-break" style="color: #2b3990;">Selamat Datang, {{ $namaDosen }}!</h3>
+        <p class="text-muted m-0 mt-1 small fs-md-6">
             Ringkasan Bimbingan Asistensi Mengajar — Periode Aktif:
-            <strong>{{ $periodeLabel }}</strong>
+            <strong class="text-dark">{{ $periodeLabel }}</strong>
         </p>
     </div>
     <span class="badge bg-primary px-3 py-2 rounded-pill shadow-sm text-nowrap" style="font-size: 13px;">
