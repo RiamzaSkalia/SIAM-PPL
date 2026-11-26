@@ -23,7 +23,7 @@
     <div class="p-3 p-md-4 bg-white rounded-4 shadow-sm">
 
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" style="font-size: 14px;">
+            <table id="tabelMahasiswaBimbingan" class="table table-hover align-middle mb-0 w-100" style="font-size: 14px;">
                 <thead>
                     <tr class="text-muted border-bottom">
                         <th class="py-3 px-3 fw-semibold">Nama</th>
@@ -34,7 +34,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($daftarMahasiswa as $item)
+                    @foreach ($daftarMahasiswa as $item)
                         @php
                             // Menangani jika $item berupa model Mahasiswa langsung atau objek plotting/bimbingan
                             $mhs = $item->mahasiswa ?? $item;
@@ -87,16 +87,39 @@
                                 </a>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">
-                                Belum ada data mahasiswa bimbingan yang terdaftar.
-                            </td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    $(function () {
+        $('#tabelMahasiswaBimbingan').DataTable({
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            order: [[0, 'asc']],
+            columnDefs: [
+                { orderable: false, targets: -1 }
+            ],
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ mahasiswa",
+                infoEmpty: "Belum ada data mahasiswa bimbingan yang terdaftar.",
+                infoFiltered: "(disaring dari _MAX_ total data)",
+                zeroRecords: "Data mahasiswa bimbingan tidak ditemukan",
+                paginate: {
+                    first: "Awal",
+                    last: "Akhir",
+                    next: "Berikutnya",
+                    previous: "Sebelumnya"
+                }
+            }
+        });
+    });
+</script>
+@endpush

@@ -21,7 +21,7 @@
 
 <div class="bg-white rounded-4 shadow-sm p-4">
     <div class="table-responsive">
-        <table class="table align-middle text-center m-0" style="font-size: 14px;">
+        <table id="tabelRekognisiMahasiswa" class="table align-middle text-center m-0 w-100" style="font-size: 14px;">
             <thead style="background-color: #1e1b4b; color: white;">
                 <tr>
                     <th width="5%" class="py-3">No</th>
@@ -32,12 +32,12 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($mahasiswaList as $idx => $mhs)
+                @foreach($mahasiswaList as $idx => $mhs)
                 @php
                     // Hitung total SKS yang sudah disetujui untuk mahasiswa ini
                     $totalSks = $mhs->pengajuanRekognisi->where('status', 'Disetujui')->sum(function($item) {
-    return $item->matkulRekognisi->sks ?? $item->sks;
-});
+                        return $item->matkulRekognisi->sks ?? $item->sks;
+                    });
                     $maxSks = $mhs->max_sks_rekognisi ?? 20; // Default batas maksimal 20 SKS
                 @endphp
                 <tr>
@@ -62,13 +62,38 @@
                         </a>
                     </td>
                 </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="py-5 text-muted">Belum ada mahasiswa bimbingan yang mengajukan mata kuliah rekognisi.</td>
-                </tr>
-                @endforelse
+                @endforeach
             </tbody>
         </table>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    $(function () {
+        $('#tabelRekognisiMahasiswa').DataTable({
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            order: [[0, 'asc']],
+            columnDefs: [
+                { orderable: false, targets: -1 }
+            ],
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ mahasiswa",
+                infoEmpty: "Belum ada mahasiswa bimbingan yang mengajukan mata kuliah rekognisi.",
+                infoFiltered: "(disaring dari _MAX_ total data)",
+                zeroRecords: "Data mahasiswa rekognisi tidak ditemukan",
+                paginate: {
+                    first: "Awal",
+                    last: "Akhir",
+                    next: "Berikutnya",
+                    previous: "Sebelumnya"
+                }
+            }
+        });
+    });
+</script>
+@endpush
